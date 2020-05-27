@@ -9,7 +9,7 @@
 	<meta HTTP-EQUIV="Expires" CONTENT="-1" />
 	<link rel="shortcut icon" href="images/favicon.png" />
 	<link rel="icon" href="images/favicon.png" />
-	<title>软件中心 - 迅游网游加速器</title>
+	<title>软件中心 - 迅游加速器</title>
 	<link rel="stylesheet" type="text/css" href="index_style.css" />
 	<link rel="stylesheet" type="text/css" href="form_style.css" />
 	<link rel="stylesheet" type="text/css" href="usp_style.css" />
@@ -24,93 +24,7 @@
 	<script type="text/javascript" src="/general.js"></script>
 	<script type="text/javascript" src="/switcherplugin/jquery.iphone-switch.js"></script>
 	<script language="JavaScript" type="text/javascript" src="/client_function.js"></script>
-	<script type="text/javascript" src="/dbconf?p=xunyou&v=<% uptime(); %>"></script>
-	<style>
-		.Bar_container {
-			width: 85%;
-			height: 20px;
-			border: 1px inset #999;
-			margin: 0 auto;
-			margin-top: 20px \9;
-			background-color: #FFFFFF;
-			z-index: 100;
-		}
-
-		#proceeding_img_text {
-			position: absolute;
-			z-index: 101;
-			font-size: 11px;
-			color: #000000;
-			line-height: 21px;
-			width: 83%;
-		}
-
-		#proceeding_img {
-			height: 21px;
-			background: #C0D1D3 url(/images/ss_proceding.gif);
-		}
-
-		.ddnsto_btn {
-			border: 1px solid #222;
-			background: linear-gradient(to bottom, #003333 0%, #000000 100%);
-			/* W3C */
-			font-size: 10pt;
-			color: #fff;
-			padding: 5px 5px;
-			border-radius: 5px 5px 5px 5px;
-			width: 16%;
-		}
-
-		.ddnsto_btn:hover {
-			border: 1px solid #222;
-			background: linear-gradient(to bottom, #27c9c9 0%, #279fd9 100%);
-			/* W3C */
-			font-size: 10pt;
-			color: #fff;
-			padding: 5px 5px;
-			border-radius: 5px 5px 5px 5px;
-			width: 16%;
-		}
-
-		input[type=button]:focus {
-			outline: none;
-		}
-
-		.cloud_main_radius_left {
-			-webkit-border-radius: 10px 0 0 10px;
-			-moz-border-radius: 10px 0 0 10px;
-			border-radius: 10px 0 0 10px;
-		}
-
-		.cloud_main_radius_right {
-			-webkit-border-radius: 0 10px 10px 0;
-			-moz-border-radius: 0 10px 10px 0;
-			border-radius: 0 10px 10px 0;
-		}
-
-		.cloud_main_radius {
-			-webkit-border-radius: 10px;
-			-moz-border-radius: 10px;
-			border-radius: 10px;
-		}
-
-		.cloud_main_radius h2 {
-			border-bottom: 1px #AAA dashed;
-		}
-
-		.cloud_main_radius h3,
-		.cloud_main_radius h4 {
-			font-size: 12px;
-			font-weight: normal;
-			font-style: normal;
-		}
-
-		.cloud_main_radius h5 {
-			color: #FFF;
-			font-weight: normal;
-			font-style: normal;
-		}
-	</style>
+	<script type="text/javascript" src="/dbconf?p=xunyou_&v=<% uptime(); %>"></script>
 	<script>
 		var $j = jQuery.noConflict();
 
@@ -119,25 +33,19 @@
 			buildswitch();
 			version_show();
 			var rrt = document.getElementById("switch");
-			if (document.form.kms_enable.value != "1") {
+			if (document.form.xunyou_enable.value != "1") {
 				rrt.checked = false;
 			} else {
 				rrt.checked = true;
 			}
-			$j('#kms_wan_port').val(db_kms_["kms_wan_port"]);
-		}
-
-		function done_validating() {
-			return true;
 		}
 
 		function buildswitch() {
-			$j("#switch").click(
-				function () {
+			$j("#switch").click(function () {
 					if (document.getElementById('switch').checked) {
-						document.form.kms_enable.value = 1;
+						document.form.xunyou_enable.value = 1;
 					} else {
-						document.form.kms_enable.value = 0;
+						document.form.xunyou_enable.value = 0;
 					}
 				});
 		}
@@ -152,33 +60,12 @@
 			location.href = "/Main_Soft_center.asp";
 		}
 
-		function version_show() {
-			$j("#kms_version_status").html("<i>当前版本：" + db_kms_['kms_version']);
-			$j.ajax({
-				url: 'https://raw.githubusercontent.com/koolshare/koolshare.github.io/acelan_softcenter_ui/kms/config.json.js',
-				type: 'GET',
-				success: function (res) {
-					var txt = $j(res.responseText).text();
-					if (typeof (txt) != "undefined" && txt.length > 0) {
-						//console.log(txt);
-						var obj = $j.parseJSON(txt.replace("'", "\""));
-						$j("#kms_version_status").html("<i>当前版本：" + obj.version);
-						if (obj.version != db_kms_["kms_version"]) {
-							$j("#kms_version_status").html("<i>有新版本：" + obj.version);
-						}
-					}
-				}
-			});
-		}
-
-		var enable_ss = "<% nvram_get("
-		enable_ss "); %>";
-		var enable_soft = "<% nvram_get("
-		enable_soft "); %>";
+		var enable_ss = "<% nvram_get(" enable_ss "); %>";
+		var enable_soft = "<% nvram_get(" enable_soft "); %>";
 
 		function menu_hook(title, tab) {
-			tabtitle[tabtitle.length - 1] = new Array("", "KMS");
-			tablink[tablink.length - 1] = new Array("", "Module_kms.asp");
+			tabtitle[tabtitle.length - 1] = new Array("", "迅游加速器");
+			tablink[tablink.length - 1] = new Array("", "Module_xunyou.asp");
 		}
 	</script>
 </head>
@@ -187,9 +74,9 @@
 	<div id="TopBanner"></div>
 	<div id="Loading" class="popup_bg"></div>
 	<iframe name="hidden_frame" id="hidden_frame" src="" width="0" height="0" frameborder="0"></iframe>
-	<form method="POST" name="form" action="/applydb.cgi?p=kms_" target="hidden_frame">
-		<input type="hidden" name="current_page" value="Module_kms.asp" />
-		<input type="hidden" name="next_page" value="Module_kms.asp" />
+	<form method="POST" name="form" action="/applydb.cgi?p=xunyou_" target="hidden_frame">
+		<input type="hidden" name="current_page" value="Module_xunyou.asp" />
+		<input type="hidden" name="next_page" value="Module_xunyou.asp" />
 		<input type="hidden" name="group_id" value="" />
 		<input type="hidden" name="modified" value="0" />
 		<input type="hidden" name="action_mode" value="" />
@@ -197,9 +84,9 @@
 		<input type="hidden" name="action_wait" value="5" />
 		<input type="hidden" name="first_time" value="" />
 		<input type="hidden" name="preferred_lang" id="preferred_lang" value="<% nvram_get(" preferred_lang "); %>" />
-		<input type="hidden" name="SystemCmd" onkeydown="onSubmitCtrl(this, ' Refresh ')" value="kms.sh" />
+		<input type="hidden" name="SystemCmd" onkeydown="onSubmitCtrl(this, ' Refresh ')" value="xunyou.sh" />
 		<input type="hidden" name="firmver" value="<% nvram_get(" firmver "); %>" />
-		<input type="hidden" id="kms_enable" name="kms_enable" value='<% dbus_get_def("kms_enable", "0"); %>' />
+		<input type="hidden" id="xunyou_enable" name="xunyou_enable" value='<% dbus_get_def("xunyou_enable", "0"); %>' />
 		<table class="content" align="center" cellpadding="0" cellspacing="0">
 			<tr>
 				<td width="17">&nbsp;</td>
@@ -234,7 +121,7 @@
 												<p>迅游路由器插件，支持三大主机PS4、Xbox、Switch以及PC设备进行加速。</p>
 												<p>为流畅游戏提供稳定保障，主机NAT类型ALL Open，一键加速即可畅享！</p>
 
-												<div class="switch_field" style="display:table-cell;float: left;">
+												<div class="switch_field" style="position: absolute;width: 50px;height: 30px;background-color: blue;top: 20px;right: 5px;">
 													<label for="switch">
 														<input id="switch" class="switch" type="checkbox"
 															style="display: none;">
@@ -249,10 +136,19 @@
 											</div>
 											<div class="apply_gen">
 												<button id="cmdBtn" class="button_gen"
-													onclick="onSubmitCtrl(this, ' Refresh ')">提交</button>
+													onclick="window.location.href = 'http://router.xunyou.com/dist/login.html?action=1'">前往设置</button>
 											</div>
 
 											<div style="margin:30px 0 30px 5px;" class="splitLine"></div>
+
+											<div class="KoolshareBottom">
+												<br/>论坛技术支持：
+												<a href="http://www.koolshare.cn" target="_blank"> <i><u>www.koolshare.cn</u></i> 
+												</a>
+												<br/>后台技术支持： <i>Xiaobao</i> 
+												<br/>Shell, Web by： <i>fw867</i>
+												<br/>
+											</div>
 										</td>
 									</tr>
 								</table>
