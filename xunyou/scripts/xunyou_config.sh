@@ -104,7 +104,7 @@ function xunyou_acc_stop()
 
 function xunyou_acc_check()
 {
-    [ "${cfddns_enable}" != "1" ] && return 0
+    [ "${xunyou_enable}" != "1" ] && return 0
     #
     ctrlPid=`ps | grep -v grep | grep -w ${RCtrProc} | awk -F ' ' '{print $1}'`
     proxyPid=`ps | grep -v grep | grep -w ${ProxyProc} | awk -F ' ' '{print $1}'`
@@ -125,7 +125,7 @@ case $1 in
         ;;
 
     start)
-        if [ "$cfddns_enable" == "1" ];then
+        if [ "$xunyou_enable" == "1" ];then
             logger "[软件中心]: 启动迅游模块！"
             xunyou_acc_start
         else
@@ -139,6 +139,15 @@ case $1 in
 
     check)
         xunyou_acc_check
+        ;;
+
+    *)
+        if [ "$xunyou_enable" == "1" ];then
+            xunyou_acc_install
+            xunyou_acc_start
+        else
+            xunyou_acc_stop
+        fi
         ;;
 
 esac

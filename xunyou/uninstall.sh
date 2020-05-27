@@ -18,6 +18,7 @@ do
     dbus remove $value
 done
 
+rm -rf /koolshare/scripts/xunyou_status.sh
 rm -rf /koolshare/init.d/S90XunYouAcc.sh
 rm -rf /koolshare/xunyou
 rm -rf /koolshare/res/icon-xunyou.png

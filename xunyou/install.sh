@@ -39,7 +39,7 @@ cp -rf /tmp/${MODULE}/uninstall.sh  /koolshare/scripts/uninstall_xunyou.sh
 chmod +x /koolshare/xunyou/bin/*
 chmod +x /koolshare/xunyou/scripts/*
 [ ! -L "/koolshare/init.d/S90XunYouAcc.sh" ] && ln -sf /koolshare/xunyou/scripts/${MODULE}_config.sh /koolshare/init.d/S90XunYouAcc.sh
-
+[ ! -L "/koolshare/scripts/xunyou_status.sh" ] && ln -sf /koolshare/xunyou/scripts/${MODULE}_config.sh /koolshare/scripts/xunyou_status.sh
 
 dbus set ${MODULE}_version="${VERSION}"
 dbus set ${MODULE}_title="${title}"
