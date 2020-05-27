@@ -16,6 +16,11 @@
 	<link rel="stylesheet" type="text/css" href="ParentalControl.css">
 	<link rel="stylesheet" type="text/css" href="css/icon.css">
 	<link rel="stylesheet" type="text/css" href="css/element.css">
+	<style>
+		.switch:checked ~.switch_container > .switch_bar{
+			background-color: #27bea6;
+		}	
+	</style>
 	<script type="text/javascript" src="/state.js"></script>
 	<script type="text/javascript" src="/popup.js"></script>
 	<script type="text/javascript" src="/help.js"></script>
@@ -31,7 +36,6 @@
 		function init() {
 			show_menu(menu_hook);
 			buildswitch();
-			version_show();
 			var rrt = document.getElementById("switch");
 			if (document.form.xunyou_enable.value != "1") {
 				rrt.checked = false;
@@ -47,21 +51,22 @@
 					} else {
 						document.form.xunyou_enable.value = 0;
 					}
+					onSubmitCtrl(this, ' Refresh ')
 				});
 		}
 
 		function onSubmitCtrl(o, s) {
 			document.form.action_mode.value = s;
-			showLoading(3);
+			showLoading(2);
 			document.form.submit();
 		}
 
 		function reload_Soft_Center() {
-			location.href = "/Main_Soft_center.asp";
+			location.href = "/Module_Softcenter.asp";
 		}
 
-		var enable_ss = "<% nvram_get(" enable_ss "); %>";
-		var enable_soft = "<% nvram_get(" enable_soft "); %>";
+		var enable_ss = '<% nvram_get(" enable_ss "); %>';
+		var enable_soft = '<% nvram_get(" enable_soft "); %>';
 
 		function menu_hook(title, tab) {
 			tabtitle[tabtitle.length - 1] = new Array("", "迅游加速器");
@@ -83,9 +88,9 @@
 		<input type="hidden" name="action_script" value="" />
 		<input type="hidden" name="action_wait" value="5" />
 		<input type="hidden" name="first_time" value="" />
-		<input type="hidden" name="preferred_lang" id="preferred_lang" value="<% nvram_get(" preferred_lang "); %>" />
-		<input type="hidden" name="SystemCmd" onkeydown="onSubmitCtrl(this, ' Refresh ')" value="xunyou.sh" />
-		<input type="hidden" name="firmver" value="<% nvram_get(" firmver "); %>" />
+		<input type="hidden" name="preferred_lang" id="preferred_lang" value='<% nvram_get(" preferred_lang "); %>' />
+		<input type="hidden" name="SystemCmd" onkeydown="onSubmitCtrl(this, ' Refresh ')" value="xunyou_status.sh" />
+		<input type="hidden" name="firmver" value='<% nvram_get(" firmver "); %>' />
 		<input type="hidden" id="xunyou_enable" name="xunyou_enable" value='<% dbus_get_def("xunyou_enable", "0"); %>' />
 		<table class="content" align="center" cellpadding="0" cellspacing="0">
 			<tr>
@@ -96,32 +101,33 @@
 				</td>
 				<td valign="top">
 					<div id="tabMenu" class="submenuBlock"></div>
-					<table width="98%" border="0" align="left" cellpadding="0" cellspacing="0">
+					<table width="98%" border="0" align="left" cellpadding="0" cellspacing="0" style="background-color: #4d595d;">
 						<tr>
 							<td align="left" valign="top">
 								<table width="760px" border="0" cellpadding="5" cellspacing="0" bordercolor="#6b8fa3"
 									class="FormTitle" id="FormTitle">
 									<tr>
-										< bgcolor="#4D595D" colspan="3" valign="top">
-											<div>&nbsp;</div>
-											<div style="float:left;" class="formfonttitle">迅游加速器</div>
-											<div style="float:right; width:15px; height:25px;margin-top:10px">
+										<bgcolor="#4D595D" colspan="3" valign="top">
+											<div style="float:left;margin: 7% 0 0 4%;" class="formfonttitle">迅游加速器</div>
+											<div style="float:right; width:15px; height:25px;">
 												<img id="return_btn" onclick="reload_Soft_Center();" align="right"
-													style="cursor:pointer;position:absolute;margin-left:-30px;margin-top:-25px;"
+													style="cursor:pointer;position:absolute;margin-left: -2%;margin-top: 2%;"
 													title="返回软件中心" src="/images/backprev.png"
 													onMouseOver="this.src='/images/backprevclick.png'"
 													onMouseOut="this.src='/images/backprev.png'"></img>
 											</div>
 
-											<div style="margin:10px 0 30px 5px;" class="splitLine"></div>
+											<div style="width: 95%;margin: 11% 0px 4% 3%;" class="splitLine"></div>
 
-											<img src="https://image.xunyou.com/images/koolshare/softcenter-title.jpg" width="1045" height="487">
+											<div style="width: 96%;height: 341px;margin: 0 0 2% 3%;">
+												<img src="https://image.xunyou.com/images/koolshare/softcenter-title.jpg" style="width: 100%">
+											</div>
 
-											<div class="xunyou_box" style="width: 100%;position: relative;">
+											<div class="xunyou_box" style="position: relative;margin-left: 3%">
 												<p>迅游路由器插件，支持三大主机PS4、Xbox、Switch以及PC设备进行加速。</p>
 												<p>为流畅游戏提供稳定保障，主机NAT类型ALL Open，一键加速即可畅享！</p>
 
-												<div class="switch_field" style="position: absolute;width: 50px;height: 30px;background-color: blue;top: 20px;right: 5px;">
+												<div class="switch_field" style="position: absolute;width: 50px;height: 30px;top: 15%;right: 1%;">
 													<label for="switch">
 														<input id="switch" class="switch" type="checkbox"
 															style="display: none;">
@@ -134,26 +140,17 @@
 													</label>
 												</div>
 											</div>
+
+											<div style="margin: 3% 0 2% 3%;width: 96%;background: #464f52;" class="splitLine"></div>
+
 											<div class="apply_gen">
 												<button id="cmdBtn" class="button_gen"
-													onclick="window.location.href = 'http://router.xunyou.com/dist/login.html?action=1'">前往设置</button>
-											</div>
-
-											<div style="margin:30px 0 30px 5px;" class="splitLine"></div>
-
-											<div class="KoolshareBottom">
-												<br/>论坛技术支持：
-												<a href="http://www.koolshare.cn" target="_blank"> <i><u>www.koolshare.cn</u></i> 
-												</a>
-												<br/>后台技术支持： <i>Xiaobao</i> 
-												<br/>Shell, Web by： <i>fw867</i>
-												<br/>
+													onclick="window.location.href = 'http://router.xunyou.com/dist/login.html?action=1&from=softcenter'">前往设置</button>
 											</div>
 										</td>
 									</tr>
 								</table>
 							</td>
-							<td width="10" align="center" valign="top"></td>
 						</tr>
 					</table>
 				</td>
