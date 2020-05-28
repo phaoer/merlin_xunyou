@@ -18,7 +18,13 @@ CfgScripte="${BasePath}/scripts/xunyou_config.sh"
 LibPath="${BasePath}/lib/"
 RCtrProc="xy-ctrl"
 ProxyProc="xy-proxy"
+logPath="/var/log/xunyou-install.log"
 
+
+function log()
+{
+    echo [`date +"%Y-%m-%d %H:%M:%S"`] "${1}" >> ${logPath}
+}
 
 function write_hostname()
 {
@@ -26,10 +32,7 @@ function write_hostname()
     [ -n "${flag}" ] && return 0
 
     chmod 777 /etc/hosts
-    data=`ip address show ${ifname}`
-    [ -z "${data}" ] && return 1
-
-    gateway=`echo ${data} | grep inet | awk -F ' ' '{print $2}' | awk -F '/' '{print $1}'`
+    gateway=`ip address show ${ifname} | grep inet | awk -F ' ' '{print $2}' | awk -F '/' '{print $1}'`
     [ -z "${gateway}" ] && return 1
     echo "${gateway} ${domain}" >> /etc/hosts
 }
@@ -124,11 +127,11 @@ case $1 in
 
     start)
         if [ "$xunyou_enable" == "1" ];then
-            logger "[软件中心]: 启动迅游模块！"
+            log "[软件中心]: 启动迅游模块！"
             xunyou_acc_stop
             xunyou_acc_start
         else
-            logger "[软件中心]: 未设置开机启动，跳过！"
+            log "[软件中心]: 未设置开机启动，跳过！"
         fi
         ;;
 
@@ -142,9 +145,12 @@ case $1 in
 
     *)
         if [ "$xunyou_enable" == "1" ];then
+            log "[软件中心]: 启动迅游模块！"
             xunyou_acc_install
+            xunyou_acc_stop
             xunyou_acc_start
         else
+            log "[软件中心]: 停止迅游模块！"
             xunyou_acc_stop
         fi
         ;;
