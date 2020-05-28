@@ -36,33 +36,31 @@
 		function init() {
 			show_menu(menu_hook);
 			buildswitch();
-			var rrt = document.getElementById("switch");
-			if (document.form.xunyou_enable.value != "1") {
-				rrt.checked = false;
-			} else {
-				rrt.checked = true;
-			}
-
 			$j.ajax({
 				type: "GET",
 				url: "/_api/xunyou_",
 				dataType: "json",
 				async: false,
-				success: function(data) {
-					console.log(data);
+				success: function(res) {
+					var rrt = document.getElementById("switch");
+					if (res.result[0].xunyou_enable != "1") {
+						rrt.checked = false;
+					} else {
+						rrt.checked = true;
+					}
 				}
 			});
 		}
 
 		function buildswitch() {
 			$j("#switch").click(function () {
-					if (document.getElementById('switch').checked) {
-						document.form.xunyou_enable.value = 1;
-					} else {
-						document.form.xunyou_enable.value = 0;
-					}
-					onSubmitCtrl(this, ' Refresh ')
-				});
+				if (document.getElementById('switch').checked) {
+					document.form.xunyou_enable.value = 1;
+				} else {
+					document.form.xunyou_enable.value = 0;
+				}
+				onSubmitCtrl(this, ' Refresh ')
+			});
 		}
 
 		function onSubmitCtrl(o, s) {
