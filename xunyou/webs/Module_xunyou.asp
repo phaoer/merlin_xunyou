@@ -170,7 +170,7 @@
 
 											<div class="apply_gen">
 												<button id="cmdBtn" class="button_gen"
-													onclick="window.location.href = 'http://router.xunyou.com/dist/login.html?action=1&from=softcenter'">前往设置</button>
+													onclick="window.location.href = 'http://router.xunyou.com/dist/koolshare-pc.html'">前往设置</button>
 											</div>
 										</td>
 									</tr>
