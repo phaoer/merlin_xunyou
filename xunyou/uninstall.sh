@@ -2,6 +2,7 @@
 MODULE=xunyou
 title="迅游加速器"
 VERSION="1.0.0.1"
+module="xunyou_acc"
 
 eval `dbus export xunyou_`
 source /koolshare/scripts/base.sh
@@ -17,6 +18,8 @@ for value in $values
 do
     dbus remove $value
 done
+
+cru d ${module}
 
 rm -rf /koolshare/scripts/xunyou_status.sh
 rm -rf /koolshare/init.d/S90XunYouAcc.sh
