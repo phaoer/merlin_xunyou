@@ -29,7 +29,7 @@
 	<script type="text/javascript" src="/general.js"></script>
 	<script type="text/javascript" src="/switcherplugin/jquery.iphone-switch.js"></script>
 	<script language="JavaScript" type="text/javascript" src="/client_function.js"></script>
-	<script type="text/javascript" src="/dbconf?p=xunyou_&v=<% uptime(); %>"></script>
+	<!-- <script type="text/javascript" src="/dbconf?p=xunyou_&v=<% uptime(); %>"></script> -->
 	<script>
 		var $j = jQuery.noConflict();
 
@@ -42,6 +42,16 @@
 			} else {
 				rrt.checked = true;
 			}
+
+			$j.ajax({
+				type: "GET",
+				url: "/_api/xunyou_",
+				dataType: "json",
+				async: false,
+				success: function(data) {
+					console.log(data);
+				}
+			});
 		}
 
 		function buildswitch() {
@@ -57,8 +67,25 @@
 
 		function onSubmitCtrl(o, s) {
 			document.form.action_mode.value = s;
-			showLoading(2);
-			document.form.submit();
+			// showLoading(2);
+			// document.form.submit();
+			var postData = {"id": parseInt(Math.random() * 100000000), "method": "xunyou_status.sh", "params": [], "fields": {"xunyou_enable" : document.form.xunyou_enable.value} };
+			$j.ajax({
+				url: "/_api/",
+				cache: false,
+				type: "POST",
+				dataType: "json",
+				data: JSON.stringify(postData),
+				success: function(response) {
+					if (response.result == id){
+						reload_Soft_Center();
+					}
+				}
+			});
+		}
+
+		function refresh (){
+			location.href = "/Module_xunyou.asp";
 		}
 
 		function reload_Soft_Center() {
