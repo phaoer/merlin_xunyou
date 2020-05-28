@@ -29,36 +29,61 @@
 	<script type="text/javascript" src="/general.js"></script>
 	<script type="text/javascript" src="/switcherplugin/jquery.iphone-switch.js"></script>
 	<script language="JavaScript" type="text/javascript" src="/client_function.js"></script>
-	<script type="text/javascript" src="/dbconf?p=xunyou_&v=<% uptime(); %>"></script>
+	<!-- <script type="text/javascript" src="/dbconf?p=xunyou_&v=<% uptime(); %>"></script> -->
 	<script>
 		var $j = jQuery.noConflict();
 
 		function init() {
 			show_menu(menu_hook);
 			buildswitch();
-			var rrt = document.getElementById("switch");
-			if (document.form.xunyou_enable.value != "1") {
-				rrt.checked = false;
-			} else {
-				rrt.checked = true;
-			}
+			$j.ajax({
+				type: "GET",
+				url: "/_api/xunyou_",
+				dataType: "json",
+				async: false,
+				success: function(res) {
+					var rrt = document.getElementById("switch");
+					if (res.result[0].xunyou_enable != "1") {
+						rrt.checked = false;
+					} else {
+						rrt.checked = true;
+					}
+				}
+			});
 		}
 
 		function buildswitch() {
 			$j("#switch").click(function () {
-					if (document.getElementById('switch').checked) {
-						document.form.xunyou_enable.value = 1;
-					} else {
-						document.form.xunyou_enable.value = 0;
-					}
-					onSubmitCtrl(this, ' Refresh ')
-				});
+				if (document.getElementById('switch').checked) {
+					document.form.xunyou_enable.value = 1;
+				} else {
+					document.form.xunyou_enable.value = 0;
+				}
+				onSubmitCtrl(this, ' Refresh ')
+			});
 		}
 
 		function onSubmitCtrl(o, s) {
 			document.form.action_mode.value = s;
-			showLoading(2);
-			document.form.submit();
+			// showLoading(2);
+			// document.form.submit();
+			var postData = {"id": parseInt(Math.random() * 100000000), "method": "xunyou_status.sh", "params": [], "fields": {"xunyou_enable" : document.form.xunyou_enable.value} };
+			$j.ajax({
+				url: "/_api/",
+				cache: false,
+				type: "POST",
+				dataType: "json",
+				data: JSON.stringify(postData),
+				success: function(response) {
+					if (response.result == id){
+						reload_Soft_Center();
+					}
+				}
+			});
+		}
+
+		function refresh (){
+			location.href = "/Module_xunyou.asp";
 		}
 
 		function reload_Soft_Center() {
@@ -145,7 +170,7 @@
 
 											<div class="apply_gen">
 												<button id="cmdBtn" class="button_gen"
-													onclick="window.location.href = 'http://router.xunyou.com/dist/login.html?action=1&from=softcenter'">前往设置</button>
+													onclick="window.location.href = 'http://router.xunyou.com/dist/koolshare-pc.html'">前往设置</button>
 											</div>
 										</td>
 									</tr>

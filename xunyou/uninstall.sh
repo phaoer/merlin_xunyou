@@ -7,10 +7,7 @@ module="xunyou_acc"
 eval `dbus export xunyou_`
 source /koolshare/scripts/base.sh
 
-enable=`dbus get ${MODULE}_enable`
-if [ "${enable}" == "1" ];then
-    sh /koolshare/xunyou/scripts/${MODULE}_config.sh stop
-fi
+sh /koolshare/xunyou/scripts/${MODULE}_config.sh stop
 
 values=`dbus list xunyou_ | cut -d "=" -f 1`
 
