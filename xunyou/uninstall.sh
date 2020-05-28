@@ -8,7 +8,7 @@ source /koolshare/scripts/base.sh
 
 enable=`dbus get ${MODULE}_enable`
 if [ "${enable}" == "1" ];then
-    sh /koolshare/xunyou/scripts/${MODULE}_status.sh stop
+    sh /koolshare/xunyou/scripts/${MODULE}_config.sh stop
 fi
 
 values=`dbus list xunyou_ | cut -d "=" -f 1`
@@ -23,3 +23,4 @@ rm -rf /koolshare/init.d/S90XunYouAcc.sh
 rm -rf /koolshare/xunyou
 rm -rf /koolshare/res/icon-xunyou.png
 rm -rf /koolshare/webs/Module_xunyou.asp
+rm -rf /koolshare/scripts/uninstall_xunyou.sh

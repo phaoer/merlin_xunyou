@@ -22,7 +22,7 @@ ProxyProc="xy-proxy"
 
 function write_hostname()
 {
-    flag=`cat /ect/hosts | grep ${domain}`
+    flag=`cat /etc/hosts | grep ${domain}`
     [ -n "${flag}" ] && return 0
 
     chmod 777 /etc/hosts
@@ -36,10 +36,8 @@ function write_hostname()
 
 function create_config_file()
 {
-    data=`ip address show ${ifname}`
-    [ -z "${data}" ] && return 1
-    gateway=`echo ${data} | grep inet | awk -F ' ' '{print $2}' | awk -F '/' '{print $1}'`
-    mac=`echo ${data} | grep link | awk -F ' ' '{print $2}'`
+    gateway=`ip address show ${ifname} | grep inet | awk -F ' ' '{print $2}' | awk -F '/' '{print $1}'`
+    mac=`ip address show ${ifname} | grep link | awk -F ' ' '{print $2}'`
     [[ -z "${gateway}" || -z "${mac}" ]] && return 1
     RouteName=`uname -o`
     [ -z "${RouteName}" ] && RouteName="meilin"
@@ -48,16 +46,16 @@ function create_config_file()
     #
     sed -i 's/\("httpd-svr":"\).*/\1'${gateway}'",/g' ${RouteCfg}
     sed -i 's/\("route-mac":"\).*/\1'${mac}'",/g'     ${RouteCfg}
-    sed -i 's/\("log":"\).*/\1'${RouteLog}'",/g'      ${RouteCfg}
+    sed -i 's#\("log":"\).*#\1'${RouteLog}'",#g'      ${RouteCfg}
     sed -i 's/\("net-device":"\).*/\1'${ifname}'",/g'              ${RouteCfg}
     sed -i 's/\("route-name":"\).*/\1'${RouteName}'",/g'           ${RouteCfg}
-    sed -i 's/\("proxy-manage-port":"\).*/\1'${ProxyCfgPort}'",/g' ${RouteCfg}
-    sed -i 's/\("upgrade-shell":"\).*/\1'${UpdateScripte}'",/g'    ${RouteCfg}
+    sed -i 's/\("proxy-manage-port":\).*/\1'${ProxyCfgPort}',/g'   ${RouteCfg}
+    sed -i 's#\("upgrade-shell":"\).*#\1'${UpdateScripte}'",#g'    ${RouteCfg}
     #
     sed -i 's/\("local-ip":"\).*/\1'${gateway}'",/g'        ${ProxyCfg}
-    sed -i 's/\("manage":"\).*/\1'${ProxyCfgPort}'",/g'     ${ProxyCfg}
-    sed -i 's/\("log":"\).*/\1'${ProxyLog}'",/g'            ${ProxyCfg}
-    sed -i 's/\("script-cfg":"\).*/\1'${ProxyScripte}'",/g' ${ProxyCfg}
+    sed -i 's/\("manage":\).*/\1'${ProxyCfgPort}',/g'       ${ProxyCfg}
+    sed -i 's#\("log":"\).*#\1'${ProxyLog}'",#g'            ${ProxyCfg}
+    sed -i 's#\("script-cfg":"\).*#\1'${ProxyScripte}'",#g' ${ProxyCfg}
 }
 
 function  check_env_rely()
@@ -74,8 +72,8 @@ function xunyou_acc_start()
     #
     export LD_LIBRARY_PATH=${LibPath}:$LD_LIBRARY_PATH
     #
-    ${BasePath}/bin/${RCtrProc} --config ${RouteCfg} &
-    ${BasePath}/bin/${ProxyCfg} --config ${ProxyCfg} &
+    ${BasePath}/bin/${RCtrProc}  --config ${RouteCfg} &
+    ${BasePath}/bin/${ProxyProc} --config ${ProxyCfg} &
 }
 
 function xunyou_acc_install()
@@ -127,6 +125,7 @@ case $1 in
     start)
         if [ "$xunyou_enable" == "1" ];then
             logger "[软件中心]: 启动迅游模块！"
+            xunyou_acc_stop
             xunyou_acc_start
         else
             logger "[软件中心]: 未设置开机启动，跳过！"
