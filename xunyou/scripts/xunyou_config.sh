@@ -105,7 +105,10 @@ function xunyou_acc_stop()
 
 function xunyou_acc_check()
 {
-    [ "${xunyou_enable}" != "1" ] && return 0
+    if [ "${xunyou_enable}" != "1" ];then
+        xunyou_acc_stop
+        return 0
+    fi
     #
     ctrlPid=`ps | grep -v grep | grep -w ${RCtrProc} | awk -F ' ' '{print $1}'`
     proxyPid=`ps | grep -v grep | grep -w ${ProxyProc} | awk -F ' ' '{print $1}'`
@@ -113,6 +116,8 @@ function xunyou_acc_check()
     #
     xunyou_acc_stop
     xunyou_acc_start
+    #
+    log "[check] 重启进程！"
 }
 
 
@@ -127,15 +132,16 @@ case $1 in
 
     start)
         if [ "$xunyou_enable" == "1" ];then
-            log "[软件中心]: 启动迅游模块！"
+            log "[start]: 启动迅游模块！"
             xunyou_acc_stop
             xunyou_acc_start
         else
-            log "[软件中心]: 未设置开机启动，跳过！"
+            log "[start]: 未设置开机启动，跳过！"
         fi
         ;;
 
     stop)
+        log "[stop] 停止加速进程"
         xunyou_acc_stop
         ;;
 
@@ -145,12 +151,12 @@ case $1 in
 
     *)
         if [ "$xunyou_enable" == "1" ];then
-            log "[软件中心]: 启动迅游模块！"
+            log "[default]: 启动迅游模块！"
             xunyou_acc_install
             xunyou_acc_stop
             xunyou_acc_start
         else
-            log "[软件中心]: 停止迅游模块！"
+            log "[default]: 停止迅游模块！"
             xunyou_acc_stop
         fi
         ;;
