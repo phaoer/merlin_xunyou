@@ -178,6 +178,8 @@ case $1 in
         ;;
 
     *)
+        http_response "$1"
+        #
         if [ "$xunyou_enable" == "1" ];then
             log "[default]: 启动迅游模块！"
             xunyou_acc_install
