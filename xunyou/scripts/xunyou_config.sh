@@ -76,6 +76,7 @@ function xunyou_acc_start()
     create_config_file
     #
     export LD_LIBRARY_PATH=${LibPath}:$LD_LIBRARY_PATH
+    ulimit -n 2048
     #
     ${BasePath}/bin/${RCtrProc}  --config ${RouteCfg} &
     ${BasePath}/bin/${ProxyProc} --config ${ProxyCfg} &
