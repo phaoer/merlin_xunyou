@@ -30,11 +30,18 @@ function write_hostname()
 {
     flag=`cat /etc/hosts | grep ${domain}`
     [ -n "${flag}" ] && return 0
-
+    #
     chmod 777 /etc/hosts
     gateway=`ip address show ${ifname} | grep inet | awk -F ' ' '{print $2}' | awk -F '/' '{print $1}'`
     [ -z "${gateway}" ] && return 1
     echo "${gateway} ${domain}" >> /etc/hosts
+    #
+    flag=`which dnsmasq`
+    [ -z "${flag}" ] && return 0
+    flag=`ps | grep -v grep | grep dnsmasq | awk -F ' ' '{print $1}'`
+    [ -n "${flag}" ] && kill -9 ${flag}
+    dnsmasq --host-record=${domain},${gateway}
+    iptables -t nat -I PREROUTING -i ${ifname} -p udp --dport 53 -j DNAT --to ${gateway}
 }
 
 function create_config_file()
@@ -59,11 +66,6 @@ function create_config_file()
     sed -i 's/\("manage":\).*/\1'${ProxyCfgPort}',/g'       ${ProxyCfg}
     sed -i 's#\("log":"\).*#\1'${ProxyLog}'",#g'            ${ProxyCfg}
     sed -i 's#\("script-cfg":"\).*#\1'${ProxyScripte}'",#g' ${ProxyCfg}
-}
-
-function  check_env_rely()
-{
-    export LD_LIBRARY_PATH=${LibPath}:$LD_LIBRARY_PATH
 }
 
 function xunyou_acc_start()
@@ -101,6 +103,28 @@ function xunyou_acc_stop()
     [ -n "${ctrlPid}" ] && kill -9 ${ctrlPid}
     proxyPid=`ps | grep -v grep | grep -w ${ProxyProc} | awk -F ' ' '{print $1}'`
     [ -n "${proxyPid}" ] && kill -9 ${proxyPid}
+    #
+    data=`iptables -t nat -S | grep "dport 53 -j DNAT"`
+    [ -z "${data}" ] && return 0
+    value=`echo ${str#*A}`
+    iptables -t nat -D ${value}
+}
+
+function check_rule()
+{
+    flag=`which dnsmasq`
+    [ -z "${flag}" ] && return 0
+    #
+    data=`iptables -t nat -S | grep "dport 53 -j DNAT"`
+    [ -n "${data}" ] && return 0
+    #
+    gateway=`ip address show ${ifname} | grep inet | awk -F ' ' '{print $2}' | awk -F '/' '{print $1}'`
+    [ -z "${gateway}" ] && return 1
+    #
+    flag=`ps | grep -v grep | grep dnsmasq | grep ${domain}`
+    [ -n "${flag}" ] && dnsmasq --host-record=${domain},${gateway}
+    #
+    iptables -t nat -I PREROUTING -i ${ifname} -p udp --dport 53 -j DNAT --to ${gateway}
 }
 
 function xunyou_acc_check()
@@ -109,6 +133,8 @@ function xunyou_acc_check()
         xunyou_acc_stop
         return 0
     fi
+    #
+    check_rule
     #
     ctrlPid=`ps | grep -v grep | grep -w ${RCtrProc} | awk -F ' ' '{print $1}'`
     proxyPid=`ps | grep -v grep | grep -w ${ProxyProc} | awk -F ' ' '{print $1}'`
