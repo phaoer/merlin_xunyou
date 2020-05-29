@@ -67,7 +67,7 @@
 			document.form.action_mode.value = s;
 			// showLoading(2);
 			// document.form.submit();
-			var postData = {"id": parseInt(Math.random() * 100000000), "method": "xunyou_status.sh", "params": [], "fields": {"xunyou_enable" : document.form.xunyou_enable.value} };
+			var postData = {"id": parseInt(Math.random() * 100000000), "method": "xunyou_config.sh", "params": [1], "fields": {"xunyou_enable" : document.form.xunyou_enable.value} };
 			$j.ajax({
 				url: "/_api/",
 				cache: false,
