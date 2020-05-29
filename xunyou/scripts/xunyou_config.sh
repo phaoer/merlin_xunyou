@@ -28,19 +28,19 @@ function log()
 
 function write_hostname()
 {
-    flag=`cat /etc/hosts | grep ${domain}`
-    [ -n "${flag}" ] && return 0
     #
     chmod 777 /etc/hosts
     gateway=`ip address show ${ifname} | grep inet | awk -F ' ' '{print $2}' | awk -F '/' '{print $1}'`
     [ -z "${gateway}" ] && return 1
-    echo "${gateway} ${domain}" >> /etc/hosts
     #
     flag=`which dnsmasq`
     [ -z "${flag}" ] && return 0
     flag=`ps | grep -v grep | grep dnsmasq | awk -F ' ' '{print $1}'`
     [ -n "${flag}" ] && kill -9 ${flag}
     dnsmasq --host-record=${domain},${gateway}
+    #
+    data=`iptables -t nat -S | grep "dport 53 -j DNAT"`
+    [ -n "${data}" ] && return 0
     iptables -t nat -I PREROUTING -i ${ifname} -p udp --dport 53 -j DNAT --to ${gateway}
 }
 
@@ -50,7 +50,7 @@ function create_config_file()
     mac=`ip address show ${ifname} | grep link | awk -F ' ' '{print $2}'`
     [[ -z "${gateway}" || -z "${mac}" ]] && return 1
     #
-    RouteName=`uname -o`
+    RouteName=`uname -n`
     #
     flag=`netstat -a | grep ${ProxyCfgPort}`
     [ -n "${flag}" ] && ProxyCfgPort="39595"
@@ -117,14 +117,14 @@ function check_rule()
     flag=`which dnsmasq`
     [ -z "${flag}" ] && return 0
     #
-    data=`iptables -t nat -S | grep "dport 53 -j DNAT"`
-    [ -n "${data}" ] && return 0
-    #
     gateway=`ip address show ${ifname} | grep inet | awk -F ' ' '{print $2}' | awk -F '/' '{print $1}'`
     [ -z "${gateway}" ] && return 1
     #
     flag=`ps | grep -v grep | grep dnsmasq | grep ${domain}`
     [ -n "${flag}" ] && dnsmasq --host-record=${domain},${gateway}
+    #
+    data=`iptables -t nat -S | grep "dport 53 -j DNAT"`
+    [ -n "${data}" ] && return 0
     #
     iptables -t nat -I PREROUTING -i ${ifname} -p udp --dport 53 -j DNAT --to ${gateway}
 }
