@@ -121,7 +121,7 @@ function check_rule()
     [ -z "${gateway}" ] && return 1
     #
     flag=`ps | grep -v grep | grep dnsmasq | grep ${domain}`
-    [ -n "${flag}" ] && dnsmasq --host-record=${domain},${gateway}
+    [ -z "${flag}" ] && dnsmasq --host-record=${domain},${gateway}
     #
     data=`iptables -t nat -S | grep "dport 53 -j DNAT"`
     [ -n "${data}" ] && return 0
