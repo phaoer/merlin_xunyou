@@ -65,9 +65,10 @@
 
 		function onSubmitCtrl(o, s) {
 			document.form.action_mode.value = s;
+			var id = parseInt(Math.random() * 100000000);
 			// showLoading(2);
 			// document.form.submit();
-			var postData = {"id": parseInt(Math.random() * 100000000), "method": "xunyou_status.sh", "params": [], "fields": {"xunyou_enable" : document.form.xunyou_enable.value} };
+			var postData = {"id": id, "method": "xunyou_status.sh", "params": [], "fields": {"xunyou_enable" : document.form.xunyou_enable.value} };
 			$j.ajax({
 				url: "/_api/",
 				cache: false,
@@ -76,7 +77,7 @@
 				data: JSON.stringify(postData),
 				success: function(response) {
 					if (response.result == id){
-						reload_Soft_Center();
+						refresh();
 					}
 				}
 			});
