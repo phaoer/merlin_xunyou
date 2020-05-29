@@ -49,8 +49,9 @@ function create_config_file()
     gateway=`ip address show ${ifname} | grep inet | awk -F ' ' '{print $2}' | awk -F '/' '{print $1}'`
     mac=`ip address show ${ifname} | grep link | awk -F ' ' '{print $2}'`
     [[ -z "${gateway}" || -z "${mac}" ]] && return 1
+    #
     RouteName=`uname -o`
-    [ -z "${RouteName}" ] && RouteName="meilin"
+    #
     flag=`netstat -a | grep ${ProxyCfgPort}`
     [ -n "${flag}" ] && ProxyCfgPort="39595"
     #
