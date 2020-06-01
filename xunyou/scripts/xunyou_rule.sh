@@ -23,7 +23,7 @@ function check_depend_env()
     local ret=`lsmod | grep xt_TPROXY`
     [ -n "${ret}" ] && echo 0 && return 0
     #
-    echo 1
+	modprobe xt_TPROXY
 }
 
 function acc_rule_config()
