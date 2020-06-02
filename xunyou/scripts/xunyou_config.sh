@@ -9,6 +9,7 @@ BasePath="/koolshare/xunyou"
 domain="lan.xunyou.com"
 RouteCfg="${BasePath}/config/RouteCfg.conf"
 ProxyCfg="${BasePath}/config/ProxyCfg.conf"
+DevType="${BasePath}/config/DeviceType.info"
 ProxyCfgPort="29595"
 RouteLog="/var/log/ctrl.log"
 ProxyLog="/var/log/proxy.log"
@@ -19,6 +20,7 @@ LibPath="${BasePath}/lib/"
 RCtrProc="xy-ctrl"
 ProxyProc="xy-proxy"
 logPath="/var/log/xunyou-install.log"
+iptName="XUNYOU"
 
 
 function log()
@@ -26,10 +28,19 @@ function log()
     echo [`date +"%Y-%m-%d %H:%M:%S"`] "${1}" >> ${logPath}
 }
 
+function domain_rule_cfg()
+{
+    ret=`iptables -t nat -S | grep ${iptName}`
+    [ -z "${ret}" ] && iptables -t nat -N ${iptName}
+    #
+    data=`iptables -t nat -S | grep "dport 53 -j DNAT"`
+    [ -n "${data}" ] && return 0
+    mask=`ip address show br0 | grep inet | awk -F ' ' '{print $2}' | awk -F '/' '{print $2}'`
+    iptables -t nat -I ${iptName} -i ${ifname} -p udp --dport 53 -j DNAT --to ${gateway}
+}
+
 function write_hostname()
 {
-    #
-    chmod 777 /etc/hosts
     gateway=`ip address show ${ifname} | grep inet | awk -F ' ' '{print $2}' | awk -F '/' '{print $1}'`
     [ -z "${gateway}" ] && return 1
     #
@@ -39,9 +50,7 @@ function write_hostname()
     [ -n "${flag}" ] && kill -9 ${flag}
     dnsmasq --host-record=${domain},${gateway}
     #
-    data=`iptables -t nat -S | grep "dport 53 -j DNAT"`
-    [ -n "${data}" ] && return 0
-    #iptables -t nat -I PREROUTING -i ${ifname} -p udp --dport 53 -j DNAT --to ${gateway}
+    domain_rule_cfg
 }
 
 function create_config_file()
@@ -61,6 +70,7 @@ function create_config_file()
     sed -i 's/\("net-device":"\).*/\1'${ifname}'",/g'              ${RouteCfg}
     sed -i 's/\("route-name":"\).*/\1'${RouteName}'",/g'           ${RouteCfg}
     sed -i 's/\("proxy-manage-port":\).*/\1'${ProxyCfgPort}',/g'   ${RouteCfg}
+    sed -i 's#\("device-type":"\).*#\1'${DevType}'",#g'            ${RouteCfg}
     sed -i 's#\("upgrade-shell":"\).*#\1'${UpdateScripte}'",#g'    ${RouteCfg}
     #
     sed -i 's/\("local-ip":"\).*/\1'${gateway}'",/g'        ${ProxyCfg}
@@ -106,6 +116,9 @@ function xunyou_acc_stop()
     proxyPid=`ps | grep -v grep | grep -w ${ProxyProc} | awk -F ' ' '{print $1}'`
     [ -n "${proxyPid}" ] && kill -9 ${proxyPid}
     #
+    iptables -t nat -F XUNYOU
+    iptables -t mangle -F XUNYOU
+    #
     data=`iptables -t nat -S | grep "dport 53 -j DNAT"`
     [ -z "${data}" ] && return 0
     value=`echo ${str#*A}`
@@ -123,10 +136,7 @@ function check_rule()
     flag=`ps | grep -v grep | grep dnsmasq | grep ${domain}`
     [ -z "${flag}" ] && dnsmasq --host-record=${domain},${gateway}
     #
-    data=`iptables -t nat -S | grep "dport 53 -j DNAT"`
-    [ -n "${data}" ] && return 0
-    #
-    #iptables -t nat -I PREROUTING -i ${ifname} -p udp --dport 53 -j DNAT --to ${gateway}
+    domain_rule_cfg
 }
 
 function xunyou_acc_check()
