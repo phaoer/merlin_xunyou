@@ -9,7 +9,7 @@ BasePath="/koolshare/xunyou"
 domain="lan.xunyou.com"
 RouteCfg="${BasePath}/config/RouteCfg.conf"
 ProxyCfg="${BasePath}/config/ProxyCfg.conf"
-DevType="${BasePath}/config/DeviceType.info"
+DevType="/koolshare/configs/DeviceType.info"
 ProxyCfgPort="29595"
 RouteLog="/var/log/ctrl.log"
 ProxyLog="/var/log/proxy.log"
@@ -97,6 +97,7 @@ function xunyou_acc_start()
 
 function xunyou_acc_install()
 {
+    [ ! -d /koolshare/configs ] && mkdir -p /koolshare/configs
     #
     ret=`cru l | grep "${CfgScripte}"`
     [ -z "${ret}" ] && cru a ${module} "*/2 * * * * ${CfgScripte} check"
