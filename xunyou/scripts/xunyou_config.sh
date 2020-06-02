@@ -41,7 +41,7 @@ function write_hostname()
     #
     data=`iptables -t nat -S | grep "dport 53 -j DNAT"`
     [ -n "${data}" ] && return 0
-    iptables -t nat -I PREROUTING -i ${ifname} -p udp --dport 53 -j DNAT --to ${gateway}
+    #iptables -t nat -I PREROUTING -i ${ifname} -p udp --dport 53 -j DNAT --to ${gateway}
 }
 
 function create_config_file()
@@ -126,7 +126,7 @@ function check_rule()
     data=`iptables -t nat -S | grep "dport 53 -j DNAT"`
     [ -n "${data}" ] && return 0
     #
-    iptables -t nat -I PREROUTING -i ${ifname} -p udp --dport 53 -j DNAT --to ${gateway}
+    #iptables -t nat -I PREROUTING -i ${ifname} -p udp --dport 53 -j DNAT --to ${gateway}
 }
 
 function xunyou_acc_check()
