@@ -7,7 +7,7 @@ module="xunyou_acc"
 eval `dbus export xunyou_`
 source /koolshare/scripts/base.sh
 
-sh /koolshare/xunyou/scripts/${MODULE}_config.sh stop
+sh /koolshare/xunyou/scripts/${MODULE}_config.sh uninstall
 
 values=`dbus list xunyou_ | cut -d "=" -f 1`
 

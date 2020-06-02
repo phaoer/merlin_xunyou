@@ -20,7 +20,6 @@ LibPath="${BasePath}/lib/"
 RCtrProc="xy-ctrl"
 ProxyProc="xy-proxy"
 logPath="/var/log/xunyou-install.log"
-iptName="XUNYOU"
 
 
 function log()
@@ -30,13 +29,14 @@ function log()
 
 function domain_rule_cfg()
 {
-    ret=`iptables -t nat -S | grep ${iptName}`
-    [ -z "${ret}" ] && iptables -t nat -N ${iptName}
+    gateway=`ip address show ${ifname} | grep inet | awk -F ' ' '{print $2}' | awk -F '/' '{print $1}'`
+    [ -z "${gateway}" ] && return 1
     #
-    data=`iptables -t nat -S | grep "dport 53 -j DNAT"`
-    [ -n "${data}" ] && return 0
-    mask=`ip address show br0 | grep inet | awk -F ' ' '{print $2}' | awk -F '/' '{print $2}'`
-    iptables -t nat -I ${iptName} -i ${ifname} -p udp --dport 53 -j DNAT --to ${gateway}
+    data=`iptables -t mangle -S | grep "lan.xunyou.com"`
+    [ -z "${data}" ] && iptables -t mangle -I PREROUTING -i ${ifname} -p udp --dport 53 -m string --string "${domain}" --algo kmp -j ACCEPT
+    #
+    data=`iptables -t nat -S | grep "lan.xunyou.com"`
+    [ -z "${data}" ] && iptables -t nat -I PREROUTING -i ${ifname} -p udp --dport 53 -m string --string "${domain}" --algo kmp -j DNAT --to-destination ${gateway}
 }
 
 function write_hostname()
@@ -59,7 +59,8 @@ function create_config_file()
     mac=`ip address show ${ifname} | grep link | awk -F ' ' '{print $2}'`
     [[ -z "${gateway}" || -z "${mac}" ]] && return 1
     #
-    RouteName=`uname -n`
+    RouteName=`nvram get odmpid`
+    [ -z "${RouteName}" ] && RouteName=`nvram get productid`
     #
     flag=`netstat -a | grep ${ProxyCfgPort}`
     [ -n "${flag}" ] && ProxyCfgPort="39595"
@@ -102,13 +103,6 @@ function xunyou_acc_install()
     write_hostname
 }
 
-function xunyou_acc_uninstall()
-{
-    #
-    cru d ${module}
-    #
-}
-
 function xunyou_acc_stop()
 {
     ctrlPid=`ps | grep -v grep | grep -w ${RCtrProc} | awk -F ' ' '{print $1}'`
@@ -118,11 +112,25 @@ function xunyou_acc_stop()
     #
     iptables -t nat -F XUNYOU
     iptables -t mangle -F XUNYOU
+}
+
+function xunyou_acc_uninstall()
+{
+    xunyou_acc_stop
     #
-    data=`iptables -t nat -S | grep "dport 53 -j DNAT"`
-    [ -z "${data}" ] && return 0
-    value=`echo ${str#*A}`
-    iptables -t nat -D ${value}
+    cru d ${module}
+    #
+    data=`iptables -t nat -S | grep "lan.xunyou.com"`
+    if [ -n "${data}" ]; then
+        value=`echo ${str#*A}`
+        iptables -t nat -D ${value}
+    fi
+    #
+    data=`iptables -t mangle -S | grep "lan.xunyou.com"`
+    if [ -n "${data}" ]; then
+        value=`echo ${str#*A}`
+        iptables -t mangle -D ${value}
+    fi
 }
 
 function check_rule()
@@ -133,8 +141,12 @@ function check_rule()
     gateway=`ip address show ${ifname} | grep inet | awk -F ' ' '{print $2}' | awk -F '/' '{print $1}'`
     [ -z "${gateway}" ] && return 1
     #
+    ret=`ps | grep -v grep | grep dnsmasq | awk -F ' ' '{print $1}'`
     flag=`ps | grep -v grep | grep dnsmasq | grep ${domain}`
-    [ -z "${flag}" ] && dnsmasq --host-record=${domain},${gateway}
+    if [ -z "${flag}" ];then
+        [ -n "${ret}" ] && kill -9 ${ret}
+        dnsmasq --host-record=${domain},${gateway}
+    fi
     #
     domain_rule_cfg
 }
