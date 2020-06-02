@@ -7,6 +7,7 @@ device=${5}
 rtName="95"
 markNum="0x95"
 iptName="XUNYOU"
+ifname="br0"
 #
 node_ip=`echo ${server} | awk -F '=' '{print $2}'`
 device1=`echo ${device} | awk -F '&' '{print $1}' | awk -F '=' '{print $2}'`
@@ -26,12 +27,21 @@ function check_depend_env()
 	modprobe xt_TPROXY
 }
 
+function domain_rule_cfg()
+{
+    match="|03|lan|06|xunyou|03|com"
+    #
+    data=`iptables -t mangle -S | grep "036c616e0678756e796f7503636f6d"`
+    [ -z "${data}" ] && iptables -t mangle -I ${iptName} -i ${ifname} -p udp --dport 53 -m string --hex-string "${match}" --algo kmp -j ACCEPT
+}
+
 function acc_rule_config()
 {
     #配置mangle表
     local ret=`iptables -t mangle -S | grep ${iptName}`
     [ -z "${ret}" ] && iptables -t mangle -N ${iptName}
     iptables -t mangle -F ${iptName}
+    domain_rule_cfg
     iptables -t mangle -A ${iptName} -d ${gateway} -j ACCEPT
     
     #配置nat表

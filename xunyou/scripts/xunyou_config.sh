@@ -29,14 +29,15 @@ function log()
 
 function domain_rule_cfg()
 {
+    match="|03|lan|06|xunyou|03|com"
     gateway=`ip address show ${ifname} | grep inet | awk -F ' ' '{print $2}' | awk -F '/' '{print $1}'`
     [ -z "${gateway}" ] && return 1
     #
-    data=`iptables -t mangle -S | grep "lan.xunyou.com"`
-    [ -z "${data}" ] && iptables -t mangle -I PREROUTING -i ${ifname} -p udp --dport 53 -m string --string "${domain}" --algo kmp -j ACCEPT
+    data=`iptables -t mangle -S | grep "036c616e0678756e796f7503636f6d"`
+    [ -z "${data}" ] && iptables -t mangle -I PREROUTING -i ${ifname} -p udp --dport 53 -m string --hex-string "${match}" --algo kmp -j ACCEPT
     #
-    data=`iptables -t nat -S | grep "lan.xunyou.com"`
-    [ -z "${data}" ] && iptables -t nat -I PREROUTING -i ${ifname} -p udp --dport 53 -m string --string "${domain}" --algo kmp -j DNAT --to-destination ${gateway}
+    data=`iptables -t nat -S | grep "036c616e0678756e796f7503636f6d"`
+    [ -z "${data}" ] && iptables -t nat -I PREROUTING -i ${ifname} -p udp --dport 53 -m string --hex-string "${match}" --algo kmp -j DNAT --to-destination ${gateway}
 }
 
 function write_hostname()
