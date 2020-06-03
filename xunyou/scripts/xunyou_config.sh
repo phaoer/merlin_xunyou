@@ -133,6 +133,9 @@ function xunyou_acc_uninstall()
         value=`echo ${str#*A}`
         iptables -t mangle -D ${value}
     fi
+    ##
+    rm -rf ${RouteLog}*
+    rm -rf ${ProxyLog}*
 }
 
 function check_rule()
