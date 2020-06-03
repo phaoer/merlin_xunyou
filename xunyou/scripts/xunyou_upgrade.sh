@@ -8,11 +8,11 @@
 #参数1 =7 获取设备型号和固件版本号
 if [ "$1" = "0" ]; then
     if [ ! -d "/tmp/upgrade" ];then
-			mkdir $file_path
+			mkdir -p /tmp/upgrade
 	fi
 elif [ "$1" = "1" ]; then
     if [ -e "/tmp/upgrade/$2" ];then 
-        cd /tmp/upgrade && tar -xf $2
+        cd /tmp/upgrade && tar -xzf $2
     fi
 elif [ "$1" = "3" ]; then
     if [ -e "$2/$3" ];then
@@ -21,7 +21,9 @@ elif [ "$1" = "3" ]; then
 elif [ "$1" = "4" ]; then
     if [ -e "$2/$3" ];then
         rm -f "$2/$3"
-        cp -f /tmp/upgrade/$3 "$2/$3"
+        cp -f /tmp/upgrade/xunyou/bin/$3 "$2/$3"
+    else
+        cp -f /tmp/upgrade/xunyou/bin/$3 "$2/$3"
     fi
 elif [ "$1" = "5" ]; then
     if [ -e "$2/$3.bak" ];then
