@@ -35,10 +35,10 @@ elif [ "$1" = "7" ]; then
     if [ -d "/koolshare" ];then
         product_id=`nvram get odmpid`
         product_version=`nvram get buildno`
-        echo -n "ASUS/"$product_id/$product_version >/tmp/version
+        echo -n $product_version >/tmp/version
     else
         product_id=`nvram get productid`
         product_version=`nvram get innerver`
-        echo -n "ASUS/"$product_id/$product_version >/tmp/version
+        echo -n $product_version >/tmp/version
     fi
 fi
