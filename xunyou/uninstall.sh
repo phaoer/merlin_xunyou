@@ -24,3 +24,4 @@ rm -rf /koolshare/xunyou
 rm -rf /koolshare/res/icon-xunyou.png
 rm -rf /koolshare/webs/Module_xunyou.asp
 rm -rf /koolshare/scripts/uninstall_xunyou.sh
+rm -rf /var/log/xunyou-install.log
