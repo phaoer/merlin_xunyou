@@ -31,7 +31,7 @@ function domain_rule_cfg()
 {
     match="|03|lan|06|xunyou|03|com"
     #
-    data=`iptables -t mangle -S | grep "036c616e0678756e796f7503636f6d"`
+    data=`iptables -t mangle -S XUNYOU | grep "036c616e0678756e796f7503636f6d"`
     [ -z "${data}" ] && iptables -t mangle -I ${iptName} -i ${ifname} -p udp --dport 53 -m string --hex-string "${match}" --algo kmp -j ACCEPT
 }
 
@@ -71,8 +71,8 @@ function acc_rule_config()
     ret=`ip rule | grep "lookup ${rtName}"`
     [ -n "${ret}" ] && ip r f t ${rtName} && ip r a local default dev lo t ${rtName}
     #
-    iptables -t nat -I PREROUTING -p tcp -j ${iptName}
-    iptables -t mangle -I PREROUTING -p udp -j ${iptName}
+    iptables -t nat -I PREROUTING -i ${ifname} -p tcp -j ${iptName}
+    iptables -t mangle -I PREROUTING -i ${ifname} -p udp -j ${iptName}
 }
 
 function clear_rule_config()
