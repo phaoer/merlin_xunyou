@@ -37,6 +37,7 @@ elif [ "$1" = "6" ]; then
         sh /tmp/xunyou/install.sh
         dbus set xunyou_enable=1
         sh /koolshare/scripts/xunyou_status.sh install
+        sh /koolshare/scripts/xunyou_status.sh stop
         sh /koolshare/scripts/xunyou_status.sh start
 	fi
 elif [ "$1" = "7" ]; then
