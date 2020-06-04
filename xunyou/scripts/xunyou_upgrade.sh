@@ -31,6 +31,7 @@ elif [ "$1" = "5" ]; then
         rm -rf "$2/$3.bak"
     fi
 elif [ "$1" = "6" ]; then
+    sleep 10
     echo "restart the program" >1
     if [ -d "/tmp/xunyou" ];then
 		sh /koolshare/scripts/uninstall_xunyou.sh
