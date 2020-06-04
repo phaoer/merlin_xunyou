@@ -11,6 +11,7 @@ RouteCfg="${BasePath}/config/RouteCfg.conf"
 ProxyCfg="${BasePath}/config/ProxyCfg.conf"
 DevType="/koolshare/configs/DeviceType.info"
 ProxyCfgPort="29595"
+RoutePort="28099"
 RouteLog="/var/log/ctrl.log"
 ProxyLog="/var/log/proxy.log"
 ProxyScripte="${BasePath}/scripts/xunyou_rule.sh"
@@ -63,8 +64,10 @@ function create_config_file()
     RouteName=`nvram get odmpid`
     [ -z "${RouteName}" ] && RouteName=`nvram get productid`
     #
-    flag=`netstat -a | grep ${ProxyCfgPort}`
+    flag=`netstat -an | grep ${ProxyCfgPort}`
     [ -n "${flag}" ] && ProxyCfgPort="39595"
+    flag=`netstat -an | grep ${RoutePort}`
+    [ -n "${flag}" ] && RoutePort="28090"
     #
     sed -i 's/\("httpd-svr":"\).*/\1'${gateway}'",/g' ${RouteCfg}
     sed -i 's/\("route-mac":"\).*/\1'${mac}'",/g'     ${RouteCfg}
@@ -72,6 +75,7 @@ function create_config_file()
     sed -i 's/\("net-device":"\).*/\1'${ifname}'",/g'              ${RouteCfg}
     sed -i 's/\("route-name":"\).*/\1'${RouteName}'",/g'           ${RouteCfg}
     sed -i 's/\("proxy-manage-port":\).*/\1'${ProxyCfgPort}',/g'   ${RouteCfg}
+    sed -i 's/\("local-port":\).*/\1'${RoutePort}',/g'             ${RouteCfg}
     sed -i 's#\("device-type":"\).*#\1'${DevType}'",#g'            ${RouteCfg}
     sed -i 's#\("upgrade-shell":"\).*#\1'${UpdateScripte}'",#g'    ${RouteCfg}
     #
