@@ -7,14 +7,12 @@
 #参数1 =6 restart 程序;参数2：程序路径;参数3:程序名
 #参数1 =7 获取设备型号和固件版本号
 if [ "$1" = "0" ]; then
-    if [ ! -d "/tmp/upgrade" ];then
-			mkdir -p /tmp/upgrade
-    else
-        rm -rf /tmp/upgrade/*
+    if [ ! -d "/tmp/" ];then
+		mkdir -p /tmp/
 	fi
 elif [ "$1" = "1" ]; then
-    if [ -e "/tmp/upgrade/$2" ];then 
-        cd /tmp/upgrade && tar -xzf $2
+    if [ -e "/tmp/$2" ];then 
+        cd /tmp/ && tar -xzf $2
     fi
 elif [ "$1" = "3" ]; then
     if [ -e "$2/$3" ];then
@@ -23,9 +21,9 @@ elif [ "$1" = "3" ]; then
 elif [ "$1" = "4" ]; then
     if [ -e "$2/$3" ];then
         rm -f "$2/$3"
-        cp -f /tmp/upgrade/xunyou/bin/$3 "$2/$3"
+        cp -f /tmp/xunyou/bin/$3 "$2/$3"
     else
-        cp -f /tmp/upgrade/xunyou/bin/$3 "$2/$3"
+        cp -f /tmp/xunyou/bin/$3 "$2/$3"
     fi
 elif [ "$1" = "5" ]; then
     if [ -e "$2/$3.bak" ];then
@@ -36,7 +34,7 @@ elif [ "$1" = "6" ]; then
     echo "restart the program" >1
     if [ -d "/tmp/upgrade" ];then
 		sh /koolshare/scripts/uninstall_xunyou.sh
-        sh /tmp/upgrade/xunyou/install.sh
+        sh /tmp/xunyou/install.sh
 	fi
 elif [ "$1" = "7" ]; then
     if [ -d "/koolshare" ];then
