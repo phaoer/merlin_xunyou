@@ -32,7 +32,7 @@ elif [ "$1" = "5" ]; then
     fi
 elif [ "$1" = "6" ]; then
     echo "restart the program" >1
-    if [ -d "/tmp/upgrade" ];then
+    if [ -d "/tmp/xunyou" ];then
 		sh /koolshare/scripts/uninstall_xunyou.sh
         sh /tmp/xunyou/install.sh
 	fi
