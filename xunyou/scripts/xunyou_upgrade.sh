@@ -35,9 +35,10 @@ elif [ "$1" = "5" ]; then
 elif [ "$1" = "6" ]; then
     echo "restart the program" >1
     if [ -d "/tmp/upgrade" ];then
-		rm -rf /tmp/upgrade/
+		sh /koolshare/scripts/uninstall_xunyou.sh
+        sh /tmp/upgrade/xunyou/install.sh
 	fi
-    sh /koolshare/xunyou/scripts/xunyou_config.sh start
+    rm -rf /tmp/upgrade/
 elif [ "$1" = "7" ]; then
     if [ -d "/koolshare" ];then
         product_id=`nvram get odmpid`
