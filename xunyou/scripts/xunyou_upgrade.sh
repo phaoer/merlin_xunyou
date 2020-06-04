@@ -38,7 +38,6 @@ elif [ "$1" = "6" ]; then
 		sh /koolshare/scripts/uninstall_xunyou.sh
         sh /tmp/upgrade/xunyou/install.sh
 	fi
-    rm -rf /tmp/upgrade/
 elif [ "$1" = "7" ]; then
     if [ -d "/koolshare" ];then
         product_id=`nvram get odmpid`
