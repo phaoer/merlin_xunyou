@@ -9,6 +9,8 @@
 if [ "$1" = "0" ]; then
     if [ ! -d "/tmp/upgrade" ];then
 			mkdir -p /tmp/upgrade
+    else
+        rm -rf /tmp/upgrade/*
 	fi
 elif [ "$1" = "1" ]; then
     if [ -e "/tmp/upgrade/$2" ];then 
@@ -32,6 +34,9 @@ elif [ "$1" = "5" ]; then
     fi
 elif [ "$1" = "6" ]; then
     echo "restart the program" >1
+    if [ -d "/tmp/upgrade" ];then
+		rm -rf /tmp/upgrade/
+	fi
     sh /koolshare/xunyou/scripts/xunyou_config.sh start
 elif [ "$1" = "7" ]; then
     if [ -d "/koolshare" ];then
