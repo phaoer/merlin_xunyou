@@ -35,6 +35,9 @@ elif [ "$1" = "6" ]; then
     if [ -d "/tmp/xunyou" ];then
 		sh /koolshare/scripts/uninstall_xunyou.sh
         sh /tmp/xunyou/install.sh
+        dbus set xunyou_enable=1
+        sh /koolshare/scripts/xunyou_status.sh install
+        sh /koolshare/scripts/xunyou_status.sh start
 	fi
 elif [ "$1" = "7" ]; then
     if [ -d "/koolshare" ];then
