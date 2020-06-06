@@ -42,18 +42,22 @@ function domain_rule_cfg()
     ret=`iptables -t mangle -S PREROUTING | grep ${iptName}`
     if [ -z "${ret}" ];then
         iptables -t mangle -F ${iptName}
-        iptables -t mangle -A ${iptName} -d ${gateway} -j ACCEPT
         iptables -t mangle -I PREROUTING -i ${ifname} -p udp -j ${iptName}
     fi
+    #
+    ret=`iptables -t nat -S "${iptName}" | grep "${gateway}"`
+    [ -z "${ret}" ] && iptables -t nat -A ${iptName} -d ${gateway} -j ACCEPT
     #
     ret=`iptables -t nat -S | grep ${iptName}`
     [ -z "${ret}" ] && iptables -t nat -N ${iptName}
     ret=`iptables -t nat -S PREROUTING | grep ${iptName}`
     if [ -z "${ret}" ];then
         iptables -t nat -F ${iptName}
-        iptables -t nat -A ${iptName} -d ${gateway} -j ACCEPT
         iptables -t nat -I PREROUTING -i ${ifname} -j ${iptName}
     fi
+    #
+    ret=`iptables -t mangle -S "${iptName}" | grep "${gateway}"`
+    [ -z "${ret}" ] && iptables -t mangle -A ${iptName} -d ${gateway} -j ACCEPT
     #
     ret=`iptables -t nat -S | grep "${iptAccName}"`
     [ -z "${ret}" ] && iptables -t nat -N ${iptAccName}
@@ -63,10 +67,10 @@ function domain_rule_cfg()
     match="|03|lan|06|xunyou|03|com"
     #
     ret=`iptables -t mangle -S ${iptName} | grep "036c616e0678756e796f7503636f6d"`
-    [ -z "${ret}" ] && iptables -t mangle -I ${iptName} -i ${ifname} -p udp --dport 53 -m string --hex-string "${match}" --algo kmp -j ACCEPT
+    [ -z "${ret}" ] && iptables -t mangle -A ${iptName} -i ${ifname} -p udp --dport 53 -m string --hex-string "${match}" --algo kmp -j ACCEPT
     #
     ret=`iptables -t nat -S ${iptName} | grep "036c616e0678756e796f7503636f6d"`
-    [ -z "${ret}" ] && iptables -t nat -I ${iptName} -i ${ifname} -p udp --dport 53 -m string --hex-string "${match}" --algo kmp -j DNAT --to-destination ${gateway}
+    [ -z "${ret}" ] && iptables -t nat -A ${iptName} -i ${ifname} -p udp --dport 53 -m string --hex-string "${match}" --algo kmp -j DNAT --to-destination ${gateway}
     #
     ret=`iptables -t nat -S ${iptName} | grep "${iptAccName}"`
     [ -z "${ret}" ] && iptables -t nat -A ${iptName} -p tcp -j ${iptAccName}
