@@ -21,7 +21,11 @@ LibPath="${BasePath}/lib/"
 RCtrProc="xy-ctrl"
 ProxyProc="xy-proxy"
 logPath="/var/log/xunyou-install.log"
-
+DnsCfgPath="/jffs/configs/dnsmasq.d/"
+DnsConfig="${BasePath}/config/xunyou.conf"
+iptName="XUNYOU"
+iptAccName="XUNYOUACC"
+rtName="95"
 
 function log()
 {
@@ -30,15 +34,59 @@ function log()
 
 function domain_rule_cfg()
 {
-    match="|03|lan|06|xunyou|03|com"
     gateway=`ip address show ${ifname} | grep inet | awk -F ' ' '{print $2}' | awk -F '/' '{print $1}'`
     [ -z "${gateway}" ] && return 1
     #
-    data=`iptables -t mangle -S | grep "036c616e0678756e796f7503636f6d"`
-    [ -z "${data}" ] && iptables -t mangle -I PREROUTING -i ${ifname} -p udp --dport 53 -m string --hex-string "${match}" --algo kmp -j ACCEPT
+    ret=`iptables -t mangle -S | grep ${iptName}`
+    [ -z "${ret}" ] && iptables -t mangle -N ${iptName}
+    ret=`iptables -t mangle -S PREROUTING | grep ${iptName}`
+    if [ -z "${ret}" ];then
+        iptables -t mangle -F ${iptName}
+        iptables -t mangle -A ${iptName} -d ${gateway} -j ACCEPT
+        iptables -t mangle -I PREROUTING -i ${ifname} -p udp -j ${iptName}
+    fi
     #
-    data=`iptables -t nat -S | grep "036c616e0678756e796f7503636f6d"`
-    [ -z "${data}" ] && iptables -t nat -I PREROUTING -i ${ifname} -p udp --dport 53 -m string --hex-string "${match}" --algo kmp -j DNAT --to-destination ${gateway}
+    ret=`iptables -t nat -S | grep ${iptName}`
+    [ -z "${ret}" ] && iptables -t nat -N ${iptName}
+    ret=`iptables -t nat -S PREROUTING | grep ${iptName}`
+    if [ -z "${ret}" ];then
+        iptables -t nat -F ${iptName}
+        iptables -t nat -A ${iptName} -d ${gateway} -j ACCEPT
+        iptables -t nat -I PREROUTING -i ${ifname} -j ${iptName}
+    fi
+    #
+    ret=`iptables -t nat -S | grep "${iptAccName}"`
+    [ -z "${ret}" ] && iptables -t nat -N ${iptAccName}
+    ret=`iptables -t mangle -S | grep "${iptAccName}"`
+    [ -z "${ret}" ] && iptables -t mangle -N ${iptAccName}
+    #
+    match="|03|lan|06|xunyou|03|com"
+    #
+    ret=`iptables -t mangle -S ${iptName} | grep "036c616e0678756e796f7503636f6d"`
+    [ -z "${ret}" ] && iptables -t mangle -I ${iptName} -i ${ifname} -p udp --dport 53 -m string --hex-string "${match}" --algo kmp -j ACCEPT
+    #
+    ret=`iptables -t nat -S ${iptName} | grep "036c616e0678756e796f7503636f6d"`
+    [ -z "${ret}" ] && iptables -t nat -I ${iptName} -i ${ifname} -p udp --dport 53 -m string --hex-string "${match}" --algo kmp -j DNAT --to-destination ${gateway}
+    #
+    ret=`iptables -t nat -S ${iptName} | grep "${iptAccName}"`
+    [ -z "${ret}" ] && iptables -t nat -A ${iptName} -p tcp -j ${iptAccName}
+    #
+    ret=`iptables -t mangle -S ${iptName} | grep "${iptAccName}"`
+    [ -z "${ret}" ] && iptables -t mangle -A ${iptName} -p udp -j ${iptAccName}
+    #
+    ret=`iptables -t nat -S PREROUTING | sed -n '2p' | grep ${iptName}`
+    if [ -z "${ret}" ];then
+        ret=`iptables -t nat -S PREROUTING | grep ${iptName}`
+        [ -n "${ret}" ] && value=`echo ${data#*A}` && iptables -t nat -D ${value}
+        iptables -t nat -I PREROUTING -i ${ifname} -p tcp -j ${iptName}
+    fi
+    #
+    ret=`iptables -t mangle -S PREROUTING | sed -n '2p' | grep ${iptName}`
+    if [ -z "${ret}" ];then
+        ret=`iptables -t mangle -S PREROUTING | grep ${iptName}`
+        [ -n "${ret}" ] && value=`echo ${data#*A}` && iptables -t mangle -D ${value}
+        iptables -t mangle -I PREROUTING -i ${ifname} -p udp -j ${iptName}
+    fi
 }
 
 function write_hostname()
@@ -46,11 +94,12 @@ function write_hostname()
     gateway=`ip address show ${ifname} | grep inet | awk -F ' ' '{print $2}' | awk -F '/' '{print $1}'`
     [ -z "${gateway}" ] && return 1
     #
-    flag=`which dnsmasq`
-    [ -z "${flag}" ] && return 0
-    flag=`ps | grep -v grep | grep dnsmasq | awk -F ' ' '{print $1}'`
-    [ -n "${flag}" ] && kill -9 ${flag}
-    dnsmasq --host-record=${domain},${gateway}
+    data="address=/lan.xunyou.com/${gateway}"
+    echo ${data} > ${DnsConfig}
+    flag=`ls ${DnsCfgPath} | grep xunyou`
+    [ -n "${flag}" ] && rm -rf ${DnsCfgPath}xunyou.conf
+    cp -rf ${DnsConfig} ${DnsCfgPath}
+    service restart_dnsmasq
     #
     domain_rule_cfg
 }
@@ -116,8 +165,14 @@ function xunyou_acc_stop()
     proxyPid=`ps | grep -v grep | grep -w ${ProxyProc} | awk -F ' ' '{print $1}'`
     [ -n "${proxyPid}" ] && kill -9 ${proxyPid}
     #
-    iptables -t nat -F XUNYOU
-    iptables -t mangle -F XUNYOU
+    flag=`ip rule | grep ${rtName}`
+    [ -n "${flag}" ] && ip rule f t ${rtName} && ip rule d ${rtName}
+    #
+    iptables -t nat -F ${iptAccName} >/dev/null 2>&1
+    iptables -t mangle -F ${iptAccName} >/dev/null 2>&1
+    #
+    iptables -t nat -F ${iptName} >/dev/null 2>&1
+    iptables -t mangle -F ${iptName} >/dev/null 2>&1
 }
 
 function xunyou_acc_uninstall()
@@ -126,15 +181,15 @@ function xunyou_acc_uninstall()
     #
     cru d ${module}
     #
-    data=`iptables -t nat -S | grep "lan.xunyou.com"`
+    data=`iptables -t nat -S PREROUTING | grep "${iptName}"`
     if [ -n "${data}" ]; then
-        value=`echo ${str#*A}`
+        value=`echo ${data#*A}`
         iptables -t nat -D ${value}
     fi
     #
-    data=`iptables -t mangle -S | grep "lan.xunyou.com"`
+    data=`iptables -t mangle -S PREROUTING | grep "${iptName}"`
     if [ -n "${data}" ]; then
-        value=`echo ${str#*A}`
+        value=`echo ${data#*A}`
         iptables -t mangle -D ${value}
     fi
     ##
@@ -150,12 +205,10 @@ function check_rule()
     gateway=`ip address show ${ifname} | grep inet | awk -F ' ' '{print $2}' | awk -F '/' '{print $1}'`
     [ -z "${gateway}" ] && return 1
     #
-    ret=`ps | grep -v grep | grep dnsmasq | awk -F ' ' '{print $1}'`
-    flag=`ps | grep -v grep | grep dnsmasq | grep ${domain}`
-    if [ -z "${flag}" ];then
-        [ -n "${ret}" ] && kill -9 ${ret}
-        dnsmasq --host-record=${domain},${gateway}
-    fi
+    [ ! -e "${DnsCfgPath}xunyou.conf"] && cp -rf ${DnsConfig} ${DnsCfgPath} && service restart_dnsmasq
+    #
+    ret=`ps | grep -v grep | grep dnsmasq`
+    [ -n "${ret}" ] && service restart_dnsmasq
     #
     domain_rule_cfg
 }
