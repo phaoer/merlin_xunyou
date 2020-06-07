@@ -34,7 +34,7 @@ function log()
 
 function domain_rule_cfg()
 {
-    gateway=`ip address show ${ifname} | grep inet | awk -F ' ' '{print $2}' | awk -F '/' '{print $1}'`
+    gateway=`ip address show ${ifname} | grep "\<inet\>" | awk -F ' ' '{print $2}' | awk -F '/' '{print $1}'`
     [ -z "${gateway}" ] && return 1
     #
     ret=`iptables -t mangle -S | grep "\<${iptName}\>"`
@@ -94,7 +94,7 @@ function domain_rule_cfg()
 
 function write_dnsmasq()
 {
-    gateway=`ip address show ${ifname} | grep inet | awk -F ' ' '{print $2}' | awk -F '/' '{print $1}'`
+    gateway=`ip address show ${ifname} | grep "\<inet\>" | awk -F ' ' '{print $2}' | awk -F '/' '{print $1}'`
     [ -z "${gateway}" ] && return 1
     #
     data="address=/lan.xunyou.com/${gateway}"
@@ -109,7 +109,7 @@ function write_dnsmasq()
 
 function create_config_file()
 {
-    gateway=`ip address show ${ifname} | grep inet | awk -F ' ' '{print $2}' | awk -F '/' '{print $1}'`
+    gateway=`ip address show ${ifname} | grep "\<inet\>" | awk -F ' ' '{print $2}' | awk -F '/' '{print $1}'`
     mac=`ip address show ${ifname} | grep link | awk -F ' ' '{print $2}'`
     [[ -z "${gateway}" || -z "${mac}" ]] && return 1
     #
@@ -210,7 +210,7 @@ function xunyou_acc_uninstall()
 
 function check_rule()
 {
-    gateway=`ip address show ${ifname} | grep inet | awk -F ' ' '{print $2}' | awk -F '/' '{print $1}'`
+    gateway=`ip address show ${ifname} | grep "\<inet\>" | awk -F ' ' '{print $2}' | awk -F '/' '{print $1}'`
     [ -z "${gateway}" ] && return 1
     #
     [ ! -e "${DnsCfgPath}xunyou.conf"] && cp -rf ${DnsConfig} ${DnsCfgPath} && service restart_dnsmasq
