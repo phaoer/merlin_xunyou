@@ -64,14 +64,18 @@ function acc_rule_config()
     [ -n "${ret}" ] && ip r f t ${rtName} && ip r a local default dev lo t ${rtName}
 }
 
-function clear_rule_config()
+function del_iptables_rule()
 {
     #
-    local ret=`iptables -t mangle -S | grep ${iptAccName}`
+    ret=`iptables -t mangle -S | grep ${iptAccName}`
     [ -n "${ret}" ] && iptables -t mangle -F ${iptAccName}
     #
     ret=`iptables -t nat -S | grep ${iptAccName}`
     [ -n "${ret}" ] && iptables -t nat -F ${iptAccName}
+}
+
+function del_ip_rule()
+{
     #
     ret=`ip rule | grep "lookup ${rtName}"`
     [ -n "${ret}" ] && ip r f t ${rtName}
@@ -88,6 +92,14 @@ function clear_rule_config()
     #
     ret=`ip rule | grep ${rtName}`
     [ -n "${ret}" ] && ip rule d t ${rtName}
+}
+
+function clear_rule_config()
+{
+    #
+    del_ip_rule
+    #
+    del_iptables_rule
 }
 
 function proc_client_online()

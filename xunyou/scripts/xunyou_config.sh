@@ -37,27 +37,26 @@ function domain_rule_cfg()
     gateway=`ip address show ${ifname} | grep inet | awk -F ' ' '{print $2}' | awk -F '/' '{print $1}'`
     [ -z "${gateway}" ] && return 1
     #
-    ret=`iptables -t mangle -S | grep ${iptName}`
+    ret=`iptables -t mangle -S | grep "\<${iptName}\>"`
     [ -z "${ret}" ] && iptables -t mangle -N ${iptName}
-    ret=`iptables -t mangle -S PREROUTING | grep ${iptName}`
+    ret=`iptables -t mangle -S PREROUTING | grep "\<${iptName}\>"`
     if [ -z "${ret}" ];then
         iptables -t mangle -F ${iptName}
         iptables -t mangle -I PREROUTING -i ${ifname} -p udp -j ${iptName}
     fi
     #
-    ret=`iptables -t nat -S "${iptName}" | grep "${gateway}"`
-    [ -z "${ret}" ] && iptables -t nat -A ${iptName} -d ${gateway} -j ACCEPT
-    #
-    ret=`iptables -t nat -S | grep ${iptName}`
+    ret=`iptables -t nat -S | grep "\<${iptName}\>"`
     [ -z "${ret}" ] && iptables -t nat -N ${iptName}
-    ret=`iptables -t nat -S PREROUTING | grep ${iptName}`
+    ret=`iptables -t nat -S PREROUTING | grep "\<${iptName}\>"`
     if [ -z "${ret}" ];then
         iptables -t nat -F ${iptName}
         iptables -t nat -I PREROUTING -i ${ifname} -j ${iptName}
     fi
     #
-    ret=`iptables -t mangle -S "${iptName}" | grep "${gateway}"`
-    [ -z "${ret}" ] && iptables -t mangle -A ${iptName} -d ${gateway} -j ACCEPT
+    ret=`iptables -t nat -S "${iptName}" | grep "\-d ${gateway}"`
+    [ -z "${ret}" ] && iptables -t nat -I ${iptName} -d ${gateway} -j ACCEPT
+    ret=`iptables -t mangle -S "${iptName}" | grep "\-d ${gateway}"`
+    [ -z "${ret}" ] && iptables -t mangle -I ${iptName} -d ${gateway} -j ACCEPT
     #
     ret=`iptables -t nat -S | grep "${iptAccName}"`
     [ -z "${ret}" ] && iptables -t nat -N ${iptAccName}
@@ -81,19 +80,19 @@ function domain_rule_cfg()
     ret=`iptables -t nat -S PREROUTING | sed -n '2p' | grep ${iptName}`
     if [ -z "${ret}" ];then
         ret=`iptables -t nat -S PREROUTING | grep ${iptName}`
-        [ -n "${ret}" ] && value=`echo ${data#*A}` && iptables -t nat -D ${value}
+        [ -n "${ret}" ] && value=`echo ${ret#*A}` && iptables -t nat -D ${value}
         iptables -t nat -I PREROUTING -i ${ifname} -p tcp -j ${iptName}
     fi
     #
     ret=`iptables -t mangle -S PREROUTING | sed -n '2p' | grep ${iptName}`
     if [ -z "${ret}" ];then
         ret=`iptables -t mangle -S PREROUTING | grep ${iptName}`
-        [ -n "${ret}" ] && value=`echo ${data#*A}` && iptables -t mangle -D ${value}
+        [ -n "${ret}" ] && value=`echo ${ret#*A}` && iptables -t mangle -D ${value}
         iptables -t mangle -I PREROUTING -i ${ifname} -p udp -j ${iptName}
     fi
 }
 
-function write_hostname()
+function write_dnsmasq()
 {
     gateway=`ip address show ${ifname} | grep inet | awk -F ' ' '{print $2}' | awk -F '/' '{print $1}'`
     [ -z "${gateway}" ] && return 1
@@ -141,7 +140,7 @@ function create_config_file()
 function xunyou_acc_start()
 {
     #
-    write_hostname
+    write_dnsmasq
     #
     create_config_file
     #
@@ -158,8 +157,6 @@ function xunyou_acc_install()
     #
     ret=`cru l | grep "${CfgScripte}"`
     [ -z "${ret}" ] && cru a ${module} "*/2 * * * * ${CfgScripte} check"
-    #
-    write_hostname
 }
 
 function xunyou_acc_stop()
@@ -185,17 +182,27 @@ function xunyou_acc_uninstall()
     #
     cru d ${module}
     #
-    data=`iptables -t nat -S PREROUTING | grep "${iptName}"`
-    if [ -n "${data}" ]; then
-        value=`echo ${data#*A}`
-        iptables -t nat -D ${value}
-    fi
+    iptables -t nat -F ${iptName} >/dev/null 2>&1
+    iptables -t nat -F ${iptAccName} >/dev/null 2>&1
+    iptables -t nat -S PREROUTING | grep "XUNYOU" | while read line
+    do
+        value=`echo ${line#*A}`
+        iptables -t nat -D ${value} >/dev/null 2>&1
+    done
     #
-    data=`iptables -t mangle -S PREROUTING | grep "${iptName}"`
-    if [ -n "${data}" ]; then
-        value=`echo ${data#*A}`
-        iptables -t mangle -D ${value}
-    fi
+    iptables -t nat -X ${iptName} >/dev/null 2>&1
+    iptables -t nat -X ${iptAccName} >/dev/null 2>&1
+    #
+    iptables -t mangle -F ${iptName} >/dev/null 2>&1
+    iptables -t mangle -F ${iptAccName} >/dev/null 2>&1
+    iptables -t mangle -S PREROUTING | grep "XUNYOU" | while read line
+    do
+        value=`echo ${line#*A}`
+        iptables -t mangle -D ${value} >/dev/null 2>&1
+    done
+    #
+    iptables -t mangle -X ${iptName} >/dev/null 2>&1
+    iptables -t mangle -X ${iptAccName} >/dev/null 2>&1
     ##
     rm -rf ${RouteLog}*
     rm -rf ${ProxyLog}*
@@ -203,16 +210,13 @@ function xunyou_acc_uninstall()
 
 function check_rule()
 {
-    flag=`which dnsmasq`
-    [ -z "${flag}" ] && return 0
-    #
     gateway=`ip address show ${ifname} | grep inet | awk -F ' ' '{print $2}' | awk -F '/' '{print $1}'`
     [ -z "${gateway}" ] && return 1
     #
     [ ! -e "${DnsCfgPath}xunyou.conf"] && cp -rf ${DnsConfig} ${DnsCfgPath} && service restart_dnsmasq
     #
     ret=`ps | grep -v grep | grep dnsmasq`
-    [ -n "${ret}" ] && service restart_dnsmasq
+    [ -z "${ret}" ] && service restart_dnsmasq
     #
     domain_rule_cfg
 }
