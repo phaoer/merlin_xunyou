@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 server=$2
 gateway=${3}

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 MODULE=xunyou
 title="迅游加速器"
 VERSION="1.0.0.1"

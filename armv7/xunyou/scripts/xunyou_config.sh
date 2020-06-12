@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 source /koolshare/scripts/base.sh
 eval `dbus export xunyou`
@@ -142,6 +142,9 @@ function rule_init()
     #
     flag=`lsmod | grep xt_comment`
     [ -z "${flag}" ] && insmod xt_comment
+    #
+    flag=`lsmod | grep nf_tproxy_core`
+    [ -z "${flag}" ] && insmod nf_tproxy_core
     #
     flag=`lsmod | grep xt_TPROXY`
     [ -z "${flag}" ] && insmod xt_TPROXY
