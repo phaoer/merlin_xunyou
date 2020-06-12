@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 server=$2
 gateway=${3}
@@ -50,7 +50,7 @@ function acc_rule_config()
         [ -z "${ret}" ] && ip rule add from ${device1} fwmark ${markNum} pref 98 t ${rtName}
         #
         iptables -t nat -A ${iptAccName} -s ${device1} -p tcp -j DNAT --to-destination ${gateway}:${port}
-        iptables -t mangle -A ${iptAccName} -s ${device1} -p tcp -j MARK --set-mark ${markNum}
+        #iptables -t mangle -A ${iptAccName} -s ${device1} -p tcp -j MARK --set-mark ${markNum}
         iptables -t mangle -A ${iptAccName} -s ${device1} -p udp -j TPROXY --tproxy-mark ${markNum} --on-ip 127.0.0.1 --on-port ${port}
     fi
 
@@ -62,7 +62,7 @@ function acc_rule_config()
         [ -z "${ret}" ] && ip rule add from ${device2} fwmark ${markNum} pref 99 t ${rtName}
         #
         iptables -t nat -A ${iptAccName} -s ${device2} -p tcp -j DNAT --to-destination ${gateway}:${port}
-        iptables -t mangle -A ${iptAccName} -s ${device2} -p tcp -j MARK --set-mark ${markNum}
+        #iptables -t mangle -A ${iptAccName} -s ${device2} -p tcp -j MARK --set-mark ${markNum}
         iptables -t mangle -A ${iptAccName} -s ${device2} -p udp -j TPROXY --tproxy-mark ${markNum} --on-ip 127.0.0.1 --on-port ${port}
     fi
 
