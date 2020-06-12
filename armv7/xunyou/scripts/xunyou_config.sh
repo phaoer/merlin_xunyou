@@ -137,10 +137,22 @@ function create_config_file()
     sed -i 's#\("script-cfg":"\).*#\1'${ProxyScripte}'",#g' ${ProxyCfg}
 }
 
+function rule_init()
+{
+    #
+    flag=`lsmod | grep xt_comment`
+    [ -z "${flag}" ] && insmod xt_comment
+    #
+    flag=`lsmod | grep xt_TPROXY`
+    [ -z "${flag}" ] && insmod xt_TPROXY
+}
+
 function xunyou_acc_start()
 {
     #
     write_dnsmasq
+    #
+    rule_init
     #
     create_config_file
     #
