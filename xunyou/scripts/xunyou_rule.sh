@@ -5,7 +5,6 @@ gateway=${3}
 port=${4}
 device=${5}
 rtName="95"
-markNum="0x95"
 iptName="XUNYOU"
 iptAccName="XUNYOUACC"
 
@@ -45,18 +44,25 @@ function acc_rule_config()
     #
     if [[ -n "${device1}" && "${device1}" != "0.0.0.0" ]]; then
         #
+        markNum=`echo ${device1} | awk -F '.' '{printf "0x%02x%02x%02x%02x",$1,$2,$3,$4}'`
+        #
         ret=`ip rule | grep "${device1}"`
         [ -z "${ret}" ] && ip rule add from ${device1} fwmark ${markNum} pref 98 t ${rtName}
         #
         iptables -t nat -A ${iptAccName} -s ${device1} -p tcp -j DNAT --to-destination ${gateway}:${port}
+        iptables -t mangle -A ${iptAccName} -s ${device1} -p tcp -j MARK --set-mark ${markNum}
         iptables -t mangle -A ${iptAccName} -s ${device1} -p udp -j TPROXY --tproxy-mark ${markNum} --on-ip 127.0.0.1 --on-port ${port}
     fi
 
     if [[ -n "${device2}" && "${device2}" != "0.0.0.0" ]]; then
+        #
+        markNum=`echo ${device2} | awk -F '.' '{printf "0x%02x%02x%02x%02x",$1,$2,$3,$4}'`
+        #
         ret=`ip rule | grep "${device2}"`
         [ -z "${ret}" ] && ip rule add from ${device2} fwmark ${markNum} pref 99 t ${rtName}
         #
         iptables -t nat -A ${iptAccName} -s ${device2} -p tcp -j DNAT --to-destination ${gateway}:${port}
+        iptables -t mangle -A ${iptAccName} -s ${device2} -p tcp -j MARK --set-mark ${markNum}
         iptables -t mangle -A ${iptAccName} -s ${device2} -p udp -j TPROXY --tproxy-mark ${markNum} --on-ip 127.0.0.1 --on-port ${port}
     fi
 

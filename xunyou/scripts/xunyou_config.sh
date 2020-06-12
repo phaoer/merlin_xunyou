@@ -42,7 +42,7 @@ function domain_rule_cfg()
     ret=`iptables -t mangle -S PREROUTING | grep "\<${iptName}\>"`
     if [ -z "${ret}" ];then
         iptables -t mangle -F ${iptName}
-        iptables -t mangle -I PREROUTING -i ${ifname} -p udp -j ${iptName}
+        iptables -t mangle -I PREROUTING -i ${ifname} -p udp -m comment --comment "koolproxy" -j ${iptName}
     fi
     #
     ret=`iptables -t nat -S | grep "\<${iptName}\>"`
@@ -50,7 +50,7 @@ function domain_rule_cfg()
     ret=`iptables -t nat -S PREROUTING | grep "\<${iptName}\>"`
     if [ -z "${ret}" ];then
         iptables -t nat -F ${iptName}
-        iptables -t nat -I PREROUTING -i ${ifname} -j ${iptName}
+        iptables -t nat -I PREROUTING -i ${ifname} -p tcp -m comment --comment "koolproxy" -j ${iptName}
     fi
     #
     ret=`iptables -t nat -S "${iptName}" | grep "\-d ${gateway}"`
