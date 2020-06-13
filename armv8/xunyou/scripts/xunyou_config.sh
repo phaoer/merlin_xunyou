@@ -145,6 +145,7 @@ function rule_init()
     #
     flag=`lsmod | grep xt_TPROXY`
     [ -z "${flag}" ] && insmod xt_TPROXY
+    #
 }
 
 function xunyou_acc_start()
