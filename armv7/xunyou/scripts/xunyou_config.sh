@@ -225,8 +225,6 @@ function xunyou_acc_uninstall()
 
 function check_rule()
 {
-    gateway=`ip address show ${ifname} | grep "\<inet\>" | awk -F ' ' '{print $2}' | awk -F '/' '{print $1}'`
-    [ -z "${gateway}" ] && return 1
     #
     [ ! -e "${DnsCfgPath}xunyou.conf"] && cp -rf ${DnsConfig} ${DnsCfgPath} && service restart_dnsmasq
     #
