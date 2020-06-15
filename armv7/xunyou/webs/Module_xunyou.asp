@@ -29,7 +29,7 @@
 	<script type="text/javascript" src="/general.js"></script>
 	<script type="text/javascript" src="/switcherplugin/jquery.iphone-switch.js"></script>
 	<script language="JavaScript" type="text/javascript" src="/client_function.js"></script>
-	<!-- <script type="text/javascript" src="/dbconf?p=xunyou_&v=<% uptime(); %>"></script> -->
+	<script type="text/javascript" src="/dbconf?p=xunyou_&v=<% uptime(); %>"></script>
 	<script>
 		var $j = jQuery.noConflict();
 
@@ -59,7 +59,8 @@
 				} else {
 					document.form.xunyou_enable.value = 0;
 				}
-				onSubmitCtrl(this, ' Refresh ')
+				onSubmitCtrl(this, ' Refresh ');
+				document.form.submit();
 			});
 		}
 
