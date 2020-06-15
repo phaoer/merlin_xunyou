@@ -60,15 +60,13 @@
 					document.form.xunyou_enable.value = 0;
 				}
 				onSubmitCtrl(this, ' Refresh ');
-				document.form.submit();
 			});
 		}
 
 		function onSubmitCtrl(o, s) {
 			document.form.action_mode.value = s;
 			var id = parseInt(Math.random() * 100000000);
-			// showLoading(2);
-			// document.form.submit();
+			document.form.submit();
 			var postData = {"id": id, "method": "xunyou_status.sh", "params": [], "fields": {"xunyou_enable" : document.form.xunyou_enable.value} };
 			$j.ajax({
 				url: "/_api/",
@@ -89,7 +87,12 @@
 		}
 
 		function reload_Soft_Center() {
-			location.href = "/Module_Softcenter.asp";
+			var url = "/Module_Softcenter.asp";
+			var buildno = '<% nvram_get(" buildno "); %>';
+			if(buildno.indexOf("380") > -1){
+				url = "/Module_Soft_center.asp";
+			}
+			location.href = url;
 		}
 
 		var enable_ss = '<% nvram_get(" enable_ss "); %>';
