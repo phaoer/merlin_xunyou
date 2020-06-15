@@ -42,12 +42,30 @@ elif [ "$1" = "6" ]; then
 	fi
 elif [ "$1" = "7" ]; then
     if [ -d "/koolshare" ];then
-        product_id=`nvram get odmpid`
+        product_arch=`uname -m`
+        if [ ! -z ${product_arch} ];then
+            if [ ${product_arch} =  "aarch64" ];then
+                product_arch="arm-8"
+            elif [ ${product_arch} =  "armv7hl"  ];then
+                product_arch="arm-7"
+            elif [ ${product_arch} =  "armv5tel"  ];then
+                product_arch="arm-5"
+            fi
+        fi
         product_version=`nvram get buildno`
-        echo -n $product_version/ >/tmp/version
+        echo -n ${product_arch}/$product_version/ >/tmp/version
     else
-        product_id=`nvram get productid`
+        product_arch=`uname -m`
+        if [ ! -z ${product_arch} ];then
+            if [ ${product_arch} =  "aarch64" ];then
+                product_arch="arm-8"
+            elif [ ${product_arch} =  "armv7hl"  ];then
+                product_arch="arm-7"
+            elif [ ${product_arch} =  "armv5tel"  ];then
+                product_arch="arm-5"
+            fi
+        fi
         product_version=`nvram get innerver`
-        echo -n $product_version/ >/tmp/version
+        echo -n ${product_arch}/$product_version/ >/tmp/version
     fi
 fi
