@@ -137,10 +137,23 @@ function create_config_file()
     sed -i 's#\("script-cfg":"\).*#\1'${ProxyScripte}'",#g' ${ProxyCfg}
 }
 
+function rule_init()
+{
+    #
+    flag=`lsmod | grep xt_comment`
+    [ -z "${flag}" ] && insmod xt_comment
+    #
+    flag=`lsmod | grep xt_TPROXY`
+    [ -z "${flag}" ] && insmod xt_TPROXY
+    #
+}
+
 function xunyou_acc_start()
 {
     #
     write_dnsmasq
+    #
+    rule_init
     #
     create_config_file
     #
@@ -210,8 +223,6 @@ function xunyou_acc_uninstall()
 
 function check_rule()
 {
-    gateway=`ip address show ${ifname} | grep "\<inet\>" | awk -F ' ' '{print $2}' | awk -F '/' '{print $1}'`
-    [ -z "${gateway}" ] && return 1
     #
     [ ! -e "${DnsCfgPath}xunyou.conf"] && cp -rf ${DnsConfig} ${DnsCfgPath} && service restart_dnsmasq
     #

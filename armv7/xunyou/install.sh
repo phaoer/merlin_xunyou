@@ -1,4 +1,10 @@
-#!/bin/bash
+#!/bin/sh
+
+# for arm384 platform
+
+source /koolshare/scripts/base.sh
+eval `dbus export xunyou`
+
 MODULE=xunyou
 title="迅游加速器"
 VERSION="1.0.0.1"
@@ -9,11 +15,11 @@ remove_install_file(){
 }
 
 case $(uname -m) in
-    aarch64)
+    armv7l)
         ;;
 
     *)
-        echo [`date +"%Y-%m-%d %H:%M:%S"`] "本插件适用于【koolshare merlin hnd/axhnd aarch64】固件平台，你的平台：$(uname -m)不能安装！！！"
+        echo [`date +"%Y-%m-%d %H:%M:%S"`] "本插件适用于【koolshare merlin hnd/axhnd armv7l】固件平台，你的平台：$(uname -m)不能安装！！！"
         echo [`date +"%Y-%m-%d %H:%M:%S"`] "退出安装！"
         remove_install_file
         exit 1
