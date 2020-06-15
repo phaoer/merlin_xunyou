@@ -32,10 +32,28 @@
 	<script type="text/javascript" src="/dbconf?p=xunyou_&v=<% uptime(); %>"></script>
 	<script>
 		var $j = jQuery.noConflict();
+		var buildno = '<% nvram_get(" buildno "); %>';
+		if(buildno.indexOf("380") > -1){
+			buildno = 380;
+		} else {
+			buildno = buildno.split(".")[0];
+		}
 
 		function init() {
 			show_menu(menu_hook);
 			buildswitch();
+
+			if(buildno == 380){
+				var rrt = document.getElementById("switch");
+				if (document.form.xunyou_enable.value != 1) {
+					rrt.checked = false;
+				} else {
+					rrt.checked = true;
+				}
+
+				return false;
+			}
+
 			$j.ajax({
 				type: "GET",
 				url: "/_api/xunyou_",
@@ -88,10 +106,11 @@
 
 		function reload_Soft_Center() {
 			var url = "/Module_Softcenter.asp";
-			var buildno = '<% nvram_get(" buildno "); %>';
-			if(buildno.indexOf("380") > -1){
-				url = "/Module_Soft_center.asp";
+
+			if(buildno == 380){
+				url = "/Main_Soft_center.asp";
 			}
+
 			location.href = url;
 		}
 
