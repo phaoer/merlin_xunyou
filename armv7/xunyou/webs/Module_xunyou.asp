@@ -29,13 +29,31 @@
 	<script type="text/javascript" src="/general.js"></script>
 	<script type="text/javascript" src="/switcherplugin/jquery.iphone-switch.js"></script>
 	<script language="JavaScript" type="text/javascript" src="/client_function.js"></script>
-	<!-- <script type="text/javascript" src="/dbconf?p=xunyou_&v=<% uptime(); %>"></script> -->
+	<script type="text/javascript" src="/dbconf?p=xunyou_&v=<% uptime(); %>"></script>
 	<script>
 		var $j = jQuery.noConflict();
+		var buildno = '<% nvram_get(" buildno "); %>';
+		if(buildno.indexOf("380") > -1){
+			buildno = 380;
+		} else {
+			buildno = buildno.split(".")[0];
+		}
 
 		function init() {
 			show_menu(menu_hook);
 			buildswitch();
+
+			if(buildno == 380){
+				var rrt = document.getElementById("switch");
+				if (document.form.xunyou_enable.value != 1) {
+					rrt.checked = false;
+				} else {
+					rrt.checked = true;
+				}
+
+				return false;
+			}
+
 			$j.ajax({
 				type: "GET",
 				url: "/_api/xunyou_",
@@ -59,15 +77,14 @@
 				} else {
 					document.form.xunyou_enable.value = 0;
 				}
-				onSubmitCtrl(this, ' Refresh ')
+				onSubmitCtrl(this, ' Refresh ');
 			});
 		}
 
 		function onSubmitCtrl(o, s) {
 			document.form.action_mode.value = s;
 			var id = parseInt(Math.random() * 100000000);
-			// showLoading(2);
-			// document.form.submit();
+			document.form.submit();
 			var postData = {"id": id, "method": "xunyou_status.sh", "params": [], "fields": {"xunyou_enable" : document.form.xunyou_enable.value} };
 			$j.ajax({
 				url: "/_api/",
@@ -88,7 +105,13 @@
 		}
 
 		function reload_Soft_Center() {
-			location.href = "/Module_Softcenter.asp";
+			var url = "/Module_Softcenter.asp";
+
+			if(buildno == 380){
+				url = "/Main_Soft_center.asp";
+			}
+
+			location.href = url;
 		}
 
 		var enable_ss = '<% nvram_get(" enable_ss "); %>';
