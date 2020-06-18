@@ -59,6 +59,9 @@ elif [ "$1" = "7" ]; then
             product_arch="arm-8"
             product_version="384"
         fi
+        str="$product_version"
+        substr=${str%.*}
+        product_version=$substr
         echo -n ${product_arch}/$product_version/ >/tmp/version
     else
         product_arch=`uname -m`
