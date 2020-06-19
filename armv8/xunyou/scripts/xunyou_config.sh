@@ -6,7 +6,6 @@ eval `dbus export xunyou`
 module="xunyou_acc"
 ifname="br0"
 BasePath="/koolshare/xunyou"
-domain="router-lan.xunyou.com"
 RouteCfg="${BasePath}/config/RouteCfg.conf"
 ProxyCfg="${BasePath}/config/ProxyCfg.conf"
 DevType="/koolshare/configs/DeviceType.info"
@@ -26,6 +25,10 @@ DnsConfig="${BasePath}/config/xunyou.conf"
 iptName="XUNYOU"
 iptAccName="XUNYOUACC"
 rtName="95"
+#
+domain="router-lan.xunyou.com"
+match="|0a|router-lan|06|xunyou|03|com"
+domainHex="0a6c616e0678756e796f7503636f6d"
 
 function log()
 {
@@ -63,12 +66,10 @@ function domain_rule_cfg()
     ret=`iptables -t mangle -S | grep "${iptAccName}"`
     [ -z "${ret}" ] && iptables -t mangle -N ${iptAccName}
     #
-    match="|03|lan|06|xunyou|03|com"
-    #
-    ret=`iptables -t mangle -S ${iptName} | grep "036c616e0678756e796f7503636f6d"`
+    ret=`iptables -t mangle -S ${iptName} | grep "${domainHex}"`
     [ -z "${ret}" ] && iptables -t mangle -A ${iptName} -i ${ifname} -p udp --dport 53 -m string --hex-string "${match}" --algo kmp -j ACCEPT
     #
-    ret=`iptables -t nat -S ${iptName} | grep "036c616e0678756e796f7503636f6d"`
+    ret=`iptables -t nat -S ${iptName} | grep "${domainHex}"`
     [ -z "${ret}" ] && iptables -t nat -A ${iptName} -i ${ifname} -p udp --dport 53 -m string --hex-string "${match}" --algo kmp -j DNAT --to-destination ${gateway}
     #
     ret=`iptables -t nat -S ${iptName} | grep "${iptAccName}"`
