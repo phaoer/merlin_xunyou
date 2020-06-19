@@ -6,7 +6,7 @@ eval `dbus export xunyou`
 module="xunyou_acc"
 ifname="br0"
 BasePath="/koolshare/xunyou"
-domain="lan.xunyou.com"
+domain="router-lan.xunyou.com"
 RouteCfg="${BasePath}/config/RouteCfg.conf"
 ProxyCfg="${BasePath}/config/ProxyCfg.conf"
 DevType="/koolshare/configs/DeviceType.info"
@@ -97,7 +97,7 @@ function write_dnsmasq()
     gateway=`ip address show ${ifname} | grep "\<inet\>" | awk -F ' ' '{print $2}' | awk -F '/' '{print $1}'`
     [ -z "${gateway}" ] && return 1
     #
-    data="address=/lan.xunyou.com/${gateway}"
+    data="address=/${domain}/${gateway}"
     echo ${data} > ${DnsConfig}
     flag=`ls ${DnsCfgPath} | grep xunyou`
     [ -n "${flag}" ] && rm -rf ${DnsCfgPath}xunyou.conf
