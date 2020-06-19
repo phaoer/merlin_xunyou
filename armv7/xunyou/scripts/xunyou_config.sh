@@ -53,7 +53,7 @@ function domain_rule_cfg()
     ret=`iptables -t nat -S PREROUTING | grep "\<${iptName}\>"`
     if [ -z "${ret}" ];then
         iptables -t nat -F ${iptName}
-        iptables -t nat -I PREROUTING -i ${ifname} -p tcp -m comment --comment "KOOLPROXY" -j ${iptName}
+        iptables -t nat -I PREROUTING -i ${ifname} -m comment --comment "KOOLPROXY" -j ${iptName}
     fi
     #
     ret=`iptables -t nat -S "${iptName}" | grep "\-d ${gateway}"`
