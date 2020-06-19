@@ -19,7 +19,7 @@ port=`echo ${port} | awk -F '=' '{print $2}'`
 [[ "${device1}" == "0.0.0.0" && "${device2}" == "0.0.0.0" ]] && exit 1
 
 #
-function check_depend_env()
+check_depend_env()
 {
     local ret=`lsmod | grep xt_TPROXY`
     [ -n "${ret}" ] && echo 0 && return 0
@@ -27,7 +27,7 @@ function check_depend_env()
 	modprobe xt_TPROXY
 }
 
-function acc_rule_config()
+acc_rule_config()
 {
     #配置mangle表
     local ret=`iptables -t mangle -S | grep ${iptAccName}`
@@ -70,7 +70,7 @@ function acc_rule_config()
     [ -n "${ret}" ] && ip r f t ${rtName} && ip r a local default dev lo t ${rtName}
 }
 
-function del_iptables_rule()
+del_iptables_rule()
 {
     #
     ret=`iptables -t mangle -S | grep ${iptAccName}`
@@ -80,7 +80,7 @@ function del_iptables_rule()
     [ -n "${ret}" ] && iptables -t nat -F ${iptAccName}
 }
 
-function del_ip_rule()
+del_ip_rule()
 {
     #
     ret=`ip rule | grep "lookup ${rtName}"`
@@ -100,7 +100,7 @@ function del_ip_rule()
     [ -n "${ret}" ] && ip rule d t ${rtName}
 }
 
-function clear_rule_config()
+clear_rule_config()
 {
     #
     del_ip_rule
@@ -108,7 +108,7 @@ function clear_rule_config()
     del_iptables_rule
 }
 
-function proc_client_online()
+proc_client_online()
 {
     #echo $node_ip, ${gateway}, ${port}, ${device1}, ${device2}
     #
@@ -119,7 +119,7 @@ function proc_client_online()
     acc_rule_config
 }
 
-function proc_client_offline()
+proc_client_offline()
 {
     #echo $node_ip, ${gateway}, ${port}, ${device1}, ${device2}
     #

@@ -30,12 +30,12 @@ domain="router-lan.xunyou.com"
 match="|0a|router-lan|06|xunyou|03|com"
 domainHex="0a6c616e0678756e796f7503636f6d"
 
-function log()
+log()
 {
     echo [`date +"%Y-%m-%d %H:%M:%S"`] "${1}" >> ${logPath}
 }
 
-function domain_rule_cfg()
+domain_rule_cfg()
 {
     gateway=`ip address show ${ifname} | grep "\<inet\>" | awk -F ' ' '{print $2}' | awk -F '/' '{print $1}'`
     [ -z "${gateway}" ] && return 1
@@ -93,7 +93,7 @@ function domain_rule_cfg()
     fi
 }
 
-function write_dnsmasq()
+write_dnsmasq()
 {
     gateway=`ip address show ${ifname} | grep "\<inet\>" | awk -F ' ' '{print $2}' | awk -F '/' '{print $1}'`
     [ -z "${gateway}" ] && return 1
@@ -108,7 +108,7 @@ function write_dnsmasq()
     domain_rule_cfg
 }
 
-function create_config_file()
+create_config_file()
 {
     gateway=`ip address show ${ifname} | grep "\<inet\>" | awk -F ' ' '{print $2}' | awk -F '/' '{print $1}'`
     mac=`ip address show ${ifname} | grep link | awk -F ' ' '{print $2}'`
@@ -138,7 +138,7 @@ function create_config_file()
     sed -i 's#\("script-cfg":"\).*#\1'${ProxyScripte}'",#g' ${ProxyCfg}
 }
 
-function rule_init()
+rule_init()
 {
     #
     flag=`lsmod | grep xt_comment`
@@ -149,7 +149,7 @@ function rule_init()
     #
 }
 
-function xunyou_acc_start()
+xunyou_acc_start()
 {
     #
     write_dnsmasq
@@ -165,7 +165,7 @@ function xunyou_acc_start()
     ${BasePath}/bin/${ProxyProc} --config ${ProxyCfg} &
 }
 
-function xunyou_acc_install()
+xunyou_acc_install()
 {
     [ ! -d /koolshare/configs ] && mkdir -p /koolshare/configs
     #
@@ -173,7 +173,7 @@ function xunyou_acc_install()
     [ -z "${ret}" ] && cru a ${module} "*/2 * * * * ${CfgScripte} check"
 }
 
-function xunyou_acc_stop()
+xunyou_acc_stop()
 {
     ctrlPid=`ps | grep -v grep | grep -w ${RCtrProc} | awk -F ' ' '{print $1}'`
     [ -n "${ctrlPid}" ] && kill -9 ${ctrlPid}
@@ -190,7 +190,7 @@ function xunyou_acc_stop()
     iptables -t mangle -F ${iptName} >/dev/null 2>&1
 }
 
-function xunyou_acc_uninstall()
+xunyou_acc_uninstall()
 {
     xunyou_acc_stop
     #
@@ -222,7 +222,7 @@ function xunyou_acc_uninstall()
     rm -rf ${ProxyLog}*
 }
 
-function check_rule()
+check_rule()
 {
     #
     [ ! -e "${DnsCfgPath}xunyou.conf"] && cp -rf ${DnsConfig} ${DnsCfgPath} && service restart_dnsmasq
@@ -233,7 +233,7 @@ function check_rule()
     domain_rule_cfg
 }
 
-function xunyou_acc_check()
+xunyou_acc_check()
 {
     if [ "${xunyou_enable}" != "1" ];then
         xunyou_acc_stop
