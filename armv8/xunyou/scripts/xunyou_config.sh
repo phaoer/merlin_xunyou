@@ -28,7 +28,7 @@ rtName="95"
 #
 domain="router-lan.xunyou.com"
 match="|0a|router-lan|06|xunyou|03|com"
-domainHex="0a6c616e0678756e796f7503636f6d"
+domainHex="0a726f757465722d6c616e0678756e796f7503636f6d"
 
 log()
 {

@@ -1,7 +1,7 @@
 #!/bin/bash
 MODULE=xunyou
 title="迅游加速器"
-VERSION="1.0.0.1"
+VERSION="1.0.0.3"
 
 
 remove_install_file(){
@@ -11,7 +11,24 @@ remove_install_file(){
 case $(uname -m) in
     aarch64)
         ;;
-
+    armv7l)
+        kernel=`uname -r`
+        if [ -z "${kernel}" ];then
+            echo [`date +"%Y-%m-%d %H:%M:%S"`] "获取内核版本号失败！！！"
+            echo [`date +"%Y-%m-%d %H:%M:%S"`] "退出安装！"
+            remove_install_file
+            exit 1
+        fi
+        #
+        one=`echo ${kernel} | awk -F '.' '{print $1}'`
+        second=`echo ${kernel} | awk -F '.' '{print $2}'`
+        if [[ "${one}" != "4" || "${second}" != "1" ]];then
+            echo [`date +"%Y-%m-%d %H:%M:%S"`] "内核版本号不匹配，你的内核版本：$(uname -r)不能安装！！！"
+            echo [`date +"%Y-%m-%d %H:%M:%S"`] "退出安装！"
+            remove_install_file
+            exit 1
+        fi
+        ;;
     *)
         echo [`date +"%Y-%m-%d %H:%M:%S"`] "本插件适用于【koolshare merlin hnd/axhnd aarch64】固件平台，你的平台：$(uname -m)不能安装！！！"
         echo [`date +"%Y-%m-%d %H:%M:%S"`] "退出安装！"
