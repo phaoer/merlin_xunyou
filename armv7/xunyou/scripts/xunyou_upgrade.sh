@@ -44,6 +44,13 @@ elif [ "$1" = "7" ]; then
     if [ -d "/koolshare" ];then
         product_arch=`uname -m`
         product_id=`nvram get odmpid`
+        if [ -z ${product_id} ];then
+		    product_id=`nvram get productid`
+		    #echo ${product_id}
+	    fi
+        if [ -z ${product_id} ];then
+            product_id="unknow"
+        fi
         if [ ! -z ${product_arch} ];then
             if [ ${product_arch} =  "aarch64" ];then
                 product_arch="arm-8"
@@ -66,6 +73,13 @@ elif [ "$1" = "7" ]; then
     else
         product_arch=`uname -m`
         product_id=`nvram get productid`
+        if [ -z ${product_id} ];then
+		    product_id=`nvram get odmpid`
+		    #echo ${product_id}
+	    fi
+        if [ -z ${product_id} ];then
+            product_id="unknow"
+        fi
         if [ ! -z ${product_arch} ];then
             if [ ${product_arch} =  "aarch64" ];then
                 product_arch="arm-8"
@@ -75,11 +89,14 @@ elif [ "$1" = "7" ]; then
                 product_arch="arm-5"
             fi
         fi
-        product_version=`nvram get innerver`
+        product_version=`nvram get buildno`
         if [ ${product_id} =  "RT-AX82U" -o ${product_id} =  "TUF-AX3000" ];then
             product_arch="arm-8"
             product_version="384"
         fi
+        str="$product_version"
+        substr=${str%.*}
+        product_version=$substr
         echo -n ${product_arch}/$product_version/ >/tmp/version
     fi
 fi
