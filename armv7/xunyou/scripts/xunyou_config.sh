@@ -82,14 +82,14 @@ domain_rule_cfg()
     if [ -z "${ret}" ];then
         ret=`iptables -t nat -S PREROUTING | grep ${iptName}`
         [ -n "${ret}" ] && value=`echo ${ret#*A}` && iptables -t nat -D ${value}
-        iptables -t nat -I PREROUTING -i ${ifname} -p tcp -j ${iptName}
+        iptables -t nat -I PREROUTING -i ${ifname} -m comment --comment "KOOLPROXY" -j ${iptName}
     fi
     #
     ret=`iptables -t mangle -S PREROUTING | sed -n '2p' | grep ${iptName}`
     if [ -z "${ret}" ];then
         ret=`iptables -t mangle -S PREROUTING | grep ${iptName}`
         [ -n "${ret}" ] && value=`echo ${ret#*A}` && iptables -t mangle -D ${value}
-        iptables -t mangle -I PREROUTING -i ${ifname} -p udp -j ${iptName}
+        iptables -t mangle -I PREROUTING -i ${ifname} -p udp -m comment --comment "KOOLPROXY" -j ${iptName}
     fi
 }
 
