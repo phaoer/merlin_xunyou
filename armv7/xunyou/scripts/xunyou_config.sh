@@ -184,31 +184,17 @@ xunyou_acc_install()
     [ -z "${ret}" ] && cru a ${module} "*/1 * * * * ${CfgScripte} check"
 }
 
-xunyou_acc_stop()
+xunyou_clear_rule()
 {
-    ctrlPid=`ps | grep -v grep | grep -w ${RCtrProc} | awk -F ' ' '{print $1}'`
-    [ -n "${ctrlPid}" ] && kill -9 ${ctrlPid}
-    proxyPid=`ps | grep -v grep | grep -w ${ProxyProc} | awk -F ' ' '{print $1}'`
-    [ -n "${proxyPid}" ] && kill -9 ${proxyPid}
-    #
     flag=`ip rule | grep ${rtName}`
     [ -n "${flag}" ] && ip rule f t ${rtName} && ip rule d ${rtName}
     #
+    iptables -t nat -F ${iptName} >/dev/null 2>&1
     iptables -t nat -F ${iptAccName} >/dev/null 2>&1
+    #
+    iptables -t mangle -F ${iptName} >/dev/null 2>&1
     iptables -t mangle -F ${iptAccName} >/dev/null 2>&1
     #
-    iptables -t nat -F ${iptName} >/dev/null 2>&1
-    iptables -t mangle -F ${iptName} >/dev/null 2>&1
-}
-
-xunyou_acc_uninstall()
-{
-    xunyou_acc_stop
-    #
-    cru d ${module}
-    #
-    iptables -t nat -F ${iptName} >/dev/null 2>&1
-    iptables -t nat -F ${iptAccName} >/dev/null 2>&1
     iptables -t nat -S PREROUTING | grep "XUNYOU" | while read line
     do
         value=`echo ${line#*A}`
@@ -217,9 +203,7 @@ xunyou_acc_uninstall()
     #
     iptables -t nat -X ${iptName} >/dev/null 2>&1
     iptables -t nat -X ${iptAccName} >/dev/null 2>&1
-    #
-    iptables -t mangle -F ${iptName} >/dev/null 2>&1
-    iptables -t mangle -F ${iptAccName} >/dev/null 2>&1
+    ####
     iptables -t mangle -S PREROUTING | grep "XUNYOU" | while read line
     do
         value=`echo ${line#*A}`
@@ -228,6 +212,23 @@ xunyou_acc_uninstall()
     #
     iptables -t mangle -X ${iptName} >/dev/null 2>&1
     iptables -t mangle -X ${iptAccName} >/dev/null 2>&1
+}
+
+xunyou_acc_stop()
+{
+    ctrlPid=`ps | grep -v grep | grep -w ${RCtrProc} | awk -F ' ' '{print $1}'`
+    [ -n "${ctrlPid}" ] && kill -9 ${ctrlPid}
+    proxyPid=`ps | grep -v grep | grep -w ${ProxyProc} | awk -F ' ' '{print $1}'`
+    [ -n "${proxyPid}" ] && kill -9 ${proxyPid}
+    #
+    xunyou_clear_rule
+}
+
+xunyou_acc_uninstall()
+{
+    xunyou_acc_stop
+    #
+    cru d ${module}
     ##
     rm -rf ${RouteLog}*
     rm -rf ${ProxyLog}*
