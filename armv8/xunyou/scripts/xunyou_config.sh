@@ -237,6 +237,9 @@ check_rule()
     #
     [ ! -e "${DnsCfgPath}xunyou.conf"] && cp -rf ${DnsConfig} ${DnsCfgPath} && service restart_dnsmasq
     #
+    ret=`grep "conf-dir=/jffs/configs/dnsmasq.d" /etc/dnsmasq.conf`
+    [ -z "${ret}" ] && echo "conf-dir=/jffs/configs/dnsmasq.d" >>/etc/dnsmasq.conf
+
     ret=`ps | grep -v grep | grep dnsmasq`
     [ -z "${ret}" ] && service restart_dnsmasq
     #
