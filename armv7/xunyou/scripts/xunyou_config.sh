@@ -283,7 +283,6 @@ case $1 in
 
     stop)
         log "[stop] 停止加速进程"
-        #xunyou_acc_stop
         xunyou_acc_uninstall
         ;;
 
