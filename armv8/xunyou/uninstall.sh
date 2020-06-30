@@ -1,28 +1,63 @@
-#!/bin/bash
+#!/bin/sh
 MODULE=xunyou
 title="迅游加速器"
 VERSION="1.0.0.1"
 module="xunyou_acc"
+systemType=0
 
-eval `dbus export xunyou_`
-source /koolshare/scripts/base.sh
+if [ -d "/koolshare" ];then
+    systemType=0
+else
+    systemType=1
+    [ ! -d "/jffs" ] && systemType=2
+fi
 
-sh /koolshare/xunyou/scripts/${MODULE}_config.sh uninstall
+koolshare_uninstall()
+{
+    eval `dbus export xunyou_`
+    source /koolshare/scripts/base.sh
 
-values=`dbus list xunyou_ | cut -d "=" -f 1`
+    sh /koolshare/xunyou/scripts/${MODULE}_config.sh uninstall
 
-for value in $values
-do
-    dbus remove $value
-done
+    values=`dbus list xunyou_ | cut -d "=" -f 1`
 
-cru d ${module}
+    for value in $values
+    do
+        dbus remove $value
+    done
 
-rm -rf /koolshare/scripts/xunyou_status.sh
-rm -rf /koolshare/init.d/S90XunYouAcc.sh
-rm -rf /koolshare/xunyou
-rm -rf /koolshare/res/icon-xunyou.png
-rm -rf /koolshare/webs/Module_xunyou.asp
-rm -rf /koolshare/scripts/uninstall_xunyou.sh
-rm -rf /var/log/xunyou-install.log
-rm -rf /jffs/configs/dnsmasq.d/xunyou.conf
+    cru d ${module}
+
+    rm -rf /koolshare/scripts/xunyou_status.sh
+    rm -rf /koolshare/init.d/S90XunYouAcc.sh
+    rm -rf /koolshare/xunyou
+    rm -rf /koolshare/res/icon-xunyou.png
+    rm -rf /koolshare/webs/Module_xunyou.asp
+    rm -rf /koolshare/scripts/uninstall_xunyou.sh
+    rm -rf /var/log/xunyou-install.log
+    rm -rf /jffs/configs/dnsmasq.d/xunyou.conf
+}
+
+official_uninstall()
+{
+    [ ! -d "/jffs/xunyou" ] && return 1
+    #
+    sh /jffs/xunyou/scripts/${MODULE}_config.sh uninstall
+    cru d ${module}
+    #
+    rm -rf /etc/init.d/S90XunYouAcc.sh > /dev/null 2>&1
+    rm -rf /jffs/xunyou/
+}
+
+case ${systemType} in
+    0)
+        koolshare_uninstall
+        ;;
+    1)
+        official_uninstall
+        ;;
+    2)
+        ;;
+    *)
+        ;;
+esac

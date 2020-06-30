@@ -6,41 +6,21 @@
 #参数1 =5 reback  程序
 #参数1 =6 restart 程序;参数2：程序路径;参数3:程序名
 #参数1 =7 获取设备型号和固件版本号
-if [ "$1" = "0" ]; then
-    if [ ! -d "/tmp/" ];then
-		mkdir -p /tmp/
-	fi
-elif [ "$1" = "1" ]; then
-    if [ -e "/tmp/$2" ];then 
-        cd /tmp/ && tar -xzf $2
-    fi
-elif [ "$1" = "3" ]; then
-    if [ -e "$2/$3" ];then
-        cp -f "$2/$3" "$2/$3.bak"
-    fi
-elif [ "$1" = "4" ]; then
-    if [ -e "$2/$3" ];then
-        rm -f "$2/$3"
-        cp -f /tmp/xunyou/bin/$3 "$2/$3"
-    else
-        cp -f /tmp/xunyou/bin/$3 "$2/$3"
-    fi
-elif [ "$1" = "5" ]; then
-    if [ -e "$2/$3.bak" ];then
-        cp -f "$2/$3.bak" "$2/$3"
-        rm -rf "$2/$3.bak"
-    fi
-elif [ "$1" = "6" ]; then
-    echo "restart the program" >1
-    if [ -d "/tmp/xunyou" ];then
-		sh /koolshare/scripts/uninstall_xunyou.sh
-        sh /tmp/xunyou/install.sh
-        dbus set xunyou_enable=1
-        sh /koolshare/scripts/xunyou_status.sh install
-        sh /koolshare/scripts/xunyou_status.sh stop
-        sh /koolshare/scripts/xunyou_status.sh start
-	fi
-elif [ "$1" = "7" ]; then
+
+xunyouPath=""
+systemType=0
+
+if [ -d "/koolshare" ];then
+    xunyouPath="/koolshare"
+    systemType=0
+else
+    xunyouPath="/jffs"
+    systemType=1
+    [ ! -d "/jffs" ] && exit 1
+fi
+
+get_route_info()
+{
     if [ -d "/koolshare" ];then
         product_arch=`uname -m`
         product_id=`nvram get odmpid`
@@ -99,4 +79,41 @@ elif [ "$1" = "7" ]; then
         product_version=$substr
         echo -n ${product_arch}/$product_version/ >/tmp/version
     fi
-fi
+}
+
+
+case $1 in
+    0)
+        [ ! -d "/tmp/" ] && mkdir -p /tmp/
+        ;;
+    1)
+        [ -e "/tmp/$2" ] && cd /tmp/ && tar -xzf $2
+        ;;
+    3)
+        [ -e "$2/$3" ] && cp -f "$2/$3" "$2/$3.bak"
+        ;;
+    4)
+        [ -e "$2/$3" ] && rm -f "$2/$3"
+        cp -f /tmp/xunyou/bin/$3 "$2/$3"
+        ;;
+    5)
+        [ ! -e "$2/$3.bak" ] && exit 0
+        cp -f "$2/$3.bak" "$2/$3"
+        rm -rf "$2/$3.bak"
+        ;;
+    6)
+        echo "restart the program"
+        [ ！ -d "/tmp/xunyou" ] && exit 0
+        sh ${xunyouPath}/scripts/uninstall_xunyou.sh
+        sh /tmp/xunyou/install.sh
+        [ ${systemType} -eq 0] && dbus set xunyou_enable=1
+        sh ${xunyouPath}/scripts/xunyou_status.sh install
+        sh ${xunyouPath}/scripts/xunyou_status.sh stop
+        sh ${xunyouPath}/scripts/xunyou_status.sh start
+        ;;
+    7)
+        get_route_info
+        ;;
+    *)
+        ;;
+esac

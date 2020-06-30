@@ -1,14 +1,21 @@
 #!/bin/sh
 
-source /koolshare/scripts/base.sh
-eval `dbus export xunyou`
+if [ -d "/koolshare" ];then
+    source /koolshare/scripts/base.sh
+    eval `dbus export xunyou`
+    xunyouPath="/koolshare"
+else
+    xunyou_enable="1"
+    xunyouPath="/jffs"
+    [ ! -d "/jffs" ] && exit 1
+fi
 
 module="xunyou_acc"
 ifname="br0"
-BasePath="/koolshare/xunyou"
+BasePath="${xunyouPath}/xunyou"
 RouteCfg="${BasePath}/config/RouteCfg.conf"
 ProxyCfg="${BasePath}/config/ProxyCfg.conf"
-DevType="/koolshare/configs/DeviceType.info"
+DevType="${xunyouPath}/configs/DeviceType.info"
 ProxyCfgPort="29595"
 RoutePort="28099"
 RouteLog="/var/log/ctrl.log"
@@ -29,6 +36,8 @@ rtName="95"
 domain="router-lan.xunyou.com"
 match="|0a|router-lan|06|xunyou|03|com"
 domainHex="0a726f757465722d6c616e0678756e796f7503636f6d"
+
+
 
 log()
 {
@@ -169,10 +178,10 @@ xunyou_acc_start()
 
 xunyou_acc_install()
 {
-    [ ! -d /koolshare/configs ] && mkdir -p /koolshare/configs
+    [ ! -d ${xunyouPath}/configs ] && mkdir -p ${xunyouPath}/configs
     #
     ret=`cru l | grep "${CfgScripte}"`
-    [ -z "${ret}" ] && cru a ${module} "*/2 * * * * ${CfgScripte} check"
+    [ -z "${ret}" ] && cru a ${module} "*/1 * * * * ${CfgScripte} check"
 }
 
 xunyou_acc_stop()
@@ -265,7 +274,7 @@ case $1 in
         ;;
 
     start)
-        if [ "$xunyou_enable" == "1" ];then
+        if [ "${xunyou_enable}" == "1" ];then
             log "[start]: 启动迅游模块！"
             xunyou_acc_stop
             xunyou_acc_start
@@ -287,7 +296,7 @@ case $1 in
     *)
         http_response "$1"
         #
-        if [ "$xunyou_enable" == "1" ];then
+        if [ "${xunyou_enable}" == "1" ];then
             log "[default]: 启动迅游模块！"
             xunyou_acc_install
             xunyou_acc_stop
