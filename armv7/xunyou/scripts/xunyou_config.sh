@@ -247,10 +247,7 @@ check_rule()
 
 xunyou_acc_check()
 {
-    if [ "${xunyou_enable}" != "1" ];then
-        xunyou_acc_stop
-        return 0
-    fi
+    [ "${xunyou_enable}" != "1" ] && return 0
     #
     check_rule
     #
