@@ -32,6 +32,7 @@ DnsConfig="${BasePath}/config/xunyou.conf"
 iptName="XUNYOU"
 iptAccName="XUNYOUACC"
 rtName="95"
+kernelKoPath="${BasePath}/modules/kernel"
 #
 domain="router-lan.xunyou.com"
 match="|0a|router-lan|06|xunyou|03|com"
@@ -156,6 +157,13 @@ rule_init()
     flag=`lsmod | grep xt_TPROXY`
     [ -z "${flag}" ] && insmod xt_TPROXY
     #
+    flag=`lsmod | grep ip_set`
+    kernel_version=`uname -r`
+    if [ -z "${flag}" ];then
+        ret=`find ./lib/modules/ -name "ip_set.ko"`
+        [ "${ret}x" != "x" ] && insmod ip_set
+        [ "${ret}x" = "x" ] && insmod ${kernelKoPath}/${kernel_version}/ip_set 
+    fi
 }
 
 xunyou_acc_start()
