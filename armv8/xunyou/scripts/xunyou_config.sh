@@ -160,9 +160,9 @@ rule_init()
     flag=`lsmod | grep ip_set`
     kernel_version=`uname -r`
     if [ -z "${flag}" ];then
-        ret=`find ./lib/modules/ -name "ip_set.ko"`
-        [ "${ret}x" != "x" ] && insmod ip_set
-        [ "${ret}x" = "x" ] && insmod ${kernelKoPath}/${kernel_version}/ip_set 
+        find ./lib/modules/ -name "ip_set.ko" >/dev/null 2>&1
+        [ $? -eq 0 ] && insmod ip_set
+        [ $? -ne 0 ] && insmod ${kernelKoPath}/${kernel_version}/ip_set
     fi
 }
 
