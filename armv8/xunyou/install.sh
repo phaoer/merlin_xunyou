@@ -52,7 +52,8 @@ koolshare_install()
     enable=`dbus get ${MODULE}_enable`
     [ "${enable}" == "1" ] && sh /koolshare/xunyou/scripts/${MODULE}_config.sh stop
     #
-    [ ! -d "/koolshare/xunyou" ] && mkdir -p /koolshare/xunyou
+    [ -d "/koolshare/xunyou" ] && rm -rf /koolshare/xunyou
+    mkdir -p /koolshare/xunyou
     #
     rm -rf /koolshare/init.d/S90XunYouAcc.sh > /dev/null 2>&1
     rm -rf /koolshare/scripts/xunyou_status.sh > /dev/null 2>&1
@@ -93,6 +94,7 @@ official_install()
     chmod +x /jffs/xunyou/bin/*
     chmod +x /jffs/xunyou/scripts/*
     ln -sf /jffs/xunyou/scripts/${MODULE}_config.sh /etc/init.d/S90XunYouAcc.sh
+    /jffs/xunyou/scripts/${MODULE}_config.sh start
 }
 
 case ${systemType} in

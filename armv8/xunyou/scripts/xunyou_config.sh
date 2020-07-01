@@ -27,12 +27,12 @@ LibPath="${BasePath}/lib/"
 RCtrProc="xy-ctrl"
 ProxyProc="xy-proxy"
 logPath="/var/log/xunyou-install.log"
-DnsCfgPath="/jffs/configs/dnsmasq.d/"
+DnsCfgPath="/jffs/configs/dnsmasq.d"
 DnsConfig="${BasePath}/config/xunyou.conf"
 iptName="XUNYOU"
 iptAccName="XUNYOUACC"
 rtName="95"
-kernelKoPath="${BasePath}/modules/kernel"
+kernelKoPath="${BasePath}/modules/"
 #
 domain="router-lan.xunyou.com"
 match="|0a|router-lan|06|xunyou|03|com"
@@ -103,19 +103,26 @@ domain_rule_cfg()
     fi
 }
 
-write_dnsmasq()
+set_dnsmasq_config()
 {
-    gateway=`ip address show ${ifname} | grep "\<inet\>" | awk -F ' ' '{print $2}' | awk -F '/' '{print $1}'`
-    [ -z "${gateway}" ] && return 1
     #
-    data="address=/${domain}/${gateway}"
-    echo ${data} > ${DnsConfig}
-    flag=`ls ${DnsCfgPath} | grep xunyou`
-    [ -n "${flag}" ] && rm -rf ${DnsCfgPath}xunyou.conf
-    cp -rf ${DnsConfig} ${DnsCfgPath}
+    ret=`cat /etc/dnsmasq.conf | grep "conf-dir=/jffs/configs/dnsmasq.d"`
+    if [ -n "${ret}" ];then
+        [ -e "${DnsCfgPath}/xunyou.conf"] && return 0
+        #
+        gateway=`ip address show ${ifname} | grep "\<inet\>" | awk -F ' ' '{print $2}' | awk -F '/' '{print $1}'`
+        [ -z "${gateway}" ] && return 1
+        #
+        echo "address=/${domain}/${gateway}" > ${DnsConfig}
+        rm -rf ${DnsCfgPath}/xunyou.conf
+        cp -rf ${DnsConfig} ${DnsCfgPath}/
+    else
+        ret=`cat /etc/hosts | grep "router-lan.xunyou.com"`
+        [ -n "${ret}" ] && return 0
+        nvram set lan_hostname="router-lan"
+        nvram set lan_domain="xunyou.com"
+    fi
     service restart_dnsmasq
-    #
-    domain_rule_cfg
 }
 
 create_config_file()
@@ -160,18 +167,33 @@ rule_init()
     flag=`lsmod | grep ip_set`
     kernel_version=`uname -r`
     if [ -z "${flag}" ];then
-        find ./lib/modules/ -name "ip_set.ko" >/dev/null 2>&1
-        [ $? -eq 0 ] && insmod ip_set
-        [ $? -ne 0 ] && insmod ${kernelKoPath}/${kernel_version}/ip_set
+        ret=`find /lib/modules/ -name "ip_set.ko"`
+        [ -n "${ret}" ] && insmod ip_set
+        [ -z "${ret}" ] && [ -d ${kernelKoPath}/${kernel_version}/ ] && insmod ${kernelKoPath}/${kernel_version}/kernel/ip_set.ko
+    fi
+    #
+    flag=`lsmod | grep ip_set_hash_netport`
+    if [ -z "${flag}" ];then
+        ret=`find /lib/modules/ -name "ip_set_hash_netport.ko"`
+        [ -n "${ret}" ] && insmod ip_set_hash_netport
+        [ -z "${ret}" ] && [ -d ${kernelKoPath}/${kernel_version}/ ] && insmod ${kernelKoPath}/${kernel_version}/kernel/ip_set_hash_netport.ko
+    fi
+    #
+    flag=`which ipset`
+    if [ -z "${flag}" ];then
+        mkdir -p /tmp/opt/usr/bin/
+        [ -d ${kernelKoPath}/${kernel_version}/ ] && ln -sf ${kernelKoPath}/${kernel_version}/bin/ipset /tmp/opt/usr/bin/ipset
     fi
 }
 
 xunyou_acc_start()
 {
     #
-    write_dnsmasq
+    set_dnsmasq_config
     #
     rule_init
+    #
+    domain_rule_cfg
     #
     create_config_file
     #
@@ -186,7 +208,7 @@ xunyou_acc_install()
 {
     [ ! -d ${xunyouPath}/configs ] && mkdir -p ${xunyouPath}/configs
     #
-    ret=`cru l | grep "${CfgScripte}"`
+    ret=`cru l | grep "${module}"`
     [ -z "${ret}" ] && cru a ${module} "*/1 * * * * ${CfgScripte} check"
 }
 
@@ -243,11 +265,8 @@ xunyou_acc_uninstall()
 check_rule()
 {
     #
-    [ ! -e "${DnsCfgPath}xunyou.conf"] && cp -rf ${DnsConfig} ${DnsCfgPath} && service restart_dnsmasq
+    set_dnsmasq_config
     #
-    ret=`grep "conf-dir=/jffs/configs/dnsmasq.d" /etc/dnsmasq.conf`
-    [ -z "${ret}" ] && echo "conf-dir=/jffs/configs/dnsmasq.d" >>/etc/dnsmasq.conf
-
     ret=`ps | grep -v grep | grep dnsmasq`
     [ -z "${ret}" ] && service restart_dnsmasq
     #
