@@ -186,8 +186,16 @@ rule_init()
     fi
 }
 
+xunyou_set_time()
+{
+    ret=`cat /etc/TZ | grep GMT-8`
+    [ -n "${ret}" ] && return 0
+    echo "GMT-8" > /etc/TZ
+}
+
 xunyou_acc_start()
 {
+    xunyou_set_time
     #
     set_dnsmasq_config
     #
