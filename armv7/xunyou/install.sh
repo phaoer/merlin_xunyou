@@ -8,7 +8,8 @@ VERSION="1.0.0.3"
 systemType=0
 
 remove_install_file(){
-	rm -rf /tmp/${MODULE}* > /dev/null 2>&1
+    rm -rf /tmp/${MODULE}*.gz > /dev/null 2>&1
+    rm -rf /tmp/${MODULE} > /dev/null 2>&1
 }
 
 cd /tmp
@@ -38,7 +39,8 @@ koolshare_install()
     enable=`dbus get ${MODULE}_enable`
     [ "${enable}" == "1" ] && sh /koolshare/xunyou/scripts/${MODULE}_config.sh stop
     #
-    [ ! -d "/koolshare/xunyou" ] && mkdir -p /koolshare/xunyou
+    [ -d "/koolshare/xunyou" ] && rm -rf /koolshare/xunyou
+    mkdir -p /koolshare/xunyou
     #
     rm -rf /koolshare/init.d/S90XunYouAcc.sh > /dev/null 2>&1
     rm -rf /koolshare/scripts/xunyou_status.sh > /dev/null 2>&1
@@ -63,7 +65,7 @@ koolshare_install()
     dbus set softcenter_module_${MODULE}_title="${title}"
     dbus set softcenter_module_${MODULE}_description="迅游加速器，支持PC和主机加速。"
     #
-    [ "${enable}" == "1" ] &&  sh /koolshare/scripts/${MODULE}_config.sh start
+    [ "${enable}" == "1" ] &&  sh /koolshare/scripts/${MODULE}_config.sh
 }
 
 official_install()
@@ -79,6 +81,7 @@ official_install()
     chmod +x /jffs/xunyou/bin/*
     chmod +x /jffs/xunyou/scripts/*
     ln -sf /jffs/xunyou/scripts/${MODULE}_config.sh /etc/init.d/S90XunYouAcc.sh
+    /jffs/xunyou/scripts/${MODULE}_config.sh
 }
 
 case ${systemType} in

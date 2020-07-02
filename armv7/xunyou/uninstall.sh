@@ -5,6 +5,8 @@ VERSION="1.0.0.1"
 module="xunyou_acc"
 systemType=0
 
+sleep 1
+
 if [ -d "/koolshare" ];then
     systemType=0
 else
@@ -36,6 +38,7 @@ koolshare_uninstall()
     rm -rf /koolshare/scripts/uninstall_xunyou.sh
     rm -rf /var/log/xunyou-install.log
     rm -rf /jffs/configs/dnsmasq.d/xunyou.conf
+    rm -rf /tmp/xunyou*
 }
 
 official_uninstall()
@@ -47,6 +50,7 @@ official_uninstall()
     #
     rm -rf /etc/init.d/S90XunYouAcc.sh > /dev/null 2>&1
     rm -rf /jffs/xunyou/
+    rm -rf /tmp/xunyou*
 }
 
 case ${systemType} in

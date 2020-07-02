@@ -196,9 +196,15 @@ xunyou_set_time()
     echo "GMT-8" > /etc/TZ
 }
 
+xunyou_set_link()
+{
+    [ ! -e "/tmp/xunyou_uninstall.sh" ] && ln -sf ${BasePath}/uninstall.sh /tmp/xunyou_uninstall.sh
+}
+
 xunyou_acc_start()
 {
     xunyou_set_time
+    xunyou_set_link
     #
     set_dnsmasq_config
     #
@@ -333,7 +339,7 @@ case $1 in
         ;;
 
     *)
-        http_response "$1"
+        http_response "$1" > /dev/null 2>&1
         #
         if [ "${xunyou_enable}" == "1" ];then
             log "[default]: 启动迅游模块！"

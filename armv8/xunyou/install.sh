@@ -5,7 +5,7 @@ VERSION="1.0.0.3"
 systemType=0
 
 remove_install_file(){
-	rm -rf /tmp/${MODULE}*.gz > /dev/null 2>&1
+    rm -rf /tmp/${MODULE}*.gz > /dev/null 2>&1
     rm -rf /tmp/${MODULE} > /dev/null 2>&1
 }
 
