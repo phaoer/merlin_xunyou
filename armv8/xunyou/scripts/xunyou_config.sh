@@ -200,6 +200,9 @@ xunyou_acc_start()
     export LD_LIBRARY_PATH=${LibPath}:$LD_LIBRARY_PATH
     ulimit -n 2048
     #
+    ret=`ps | grep -v grep | grep nvram`
+    [ -n "${ret}" ] && killall nvram
+    #
     ${BasePath}/bin/${RCtrProc}  --config ${RouteCfg} &
     ${BasePath}/bin/${ProxyProc} --config ${ProxyCfg} &
 }
