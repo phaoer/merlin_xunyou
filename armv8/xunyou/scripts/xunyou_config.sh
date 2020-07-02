@@ -32,7 +32,7 @@ DnsConfig="${BasePath}/config/xunyou.conf"
 iptName="XUNYOU"
 iptAccName="XUNYOUACC"
 rtName="95"
-kernelKoPath="${BasePath}/modules/"
+kernelKoPath="${BasePath}/modules"
 #
 domain="router-lan.xunyou.com"
 match="|0a|router-lan|06|xunyou|03|com"
@@ -122,7 +122,7 @@ set_dnsmasq_config()
         nvram set lan_hostname="router-lan"
         nvram set lan_domain="xunyou.com"
     fi
-    service restart_dnsmasq
+    service restart_dnsmasq >/dev/null 2>&1
 }
 
 create_config_file()
@@ -271,7 +271,7 @@ check_rule()
     set_dnsmasq_config
     #
     ret=`ps | grep -v grep | grep dnsmasq`
-    [ -z "${ret}" ] && service restart_dnsmasq
+    [ -z "${ret}" ] && service restart_dnsmasq >/dev/null 2>&1
     #
     domain_rule_cfg
 }
