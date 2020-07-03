@@ -38,7 +38,7 @@ koolshare_uninstall()
     rm -rf /koolshare/scripts/uninstall_xunyou.sh
     rm -rf /var/log/xunyou-install.log
     rm -rf /jffs/configs/dnsmasq.d/xunyou.conf
-    rm -rf /tmp/xunyou*
+    rm -rf /tmp/xunyou_uninstall.sh
 }
 
 official_uninstall()
@@ -50,7 +50,7 @@ official_uninstall()
     #
     rm -rf /etc/init.d/S90XunYouAcc.sh > /dev/null 2>&1
     rm -rf /jffs/xunyou/
-    rm -rf /tmp/xunyou*
+    rm -rf /tmp/xunyou_uninstall.sh
 }
 
 case ${systemType} in

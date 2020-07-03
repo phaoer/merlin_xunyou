@@ -1,6 +1,7 @@
 #!/bin/sh
 
 # for arm384 platform
+source /etc/profile
 
 MODULE=xunyou
 title="迅游加速器"
