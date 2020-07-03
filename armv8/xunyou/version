@@ -1,3 +1,7 @@
+#适用平台
+armv8-kernel-4.1.x
+armv7-kernel-4.1.x
+
 #配置进程名称
 xy-ctrl
 #版本号

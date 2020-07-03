@@ -58,14 +58,14 @@ koolshare_install()
     #
     dbus set ${MODULE}_version="${VERSION}"
     dbus set ${MODULE}_title="${title}"
-    dbus set ${MODULE}_enable="0"
+    [ "${enable}" != "1" ] && dbus set ${MODULE}_enable="0"
     dbus set softcenter_module_${MODULE}_install=1
     dbus set softcenter_module_${MODULE}_name=${MODULE}
     dbus set softcenter_module_${MODULE}_version="${VERSION}"
     dbus set softcenter_module_${MODULE}_title="${title}"
     dbus set softcenter_module_${MODULE}_description="迅游加速器，支持PC和主机加速。"
     #
-    [ "${enable}" == "1" ] &&  sh /koolshare/scripts/${MODULE}_config.sh
+    [ "${enable}" == "1" ] &&  sh /koolshare/xunyou/scripts/${MODULE}_config.sh
 }
 
 official_install()
