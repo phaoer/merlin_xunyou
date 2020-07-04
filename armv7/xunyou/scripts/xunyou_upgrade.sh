@@ -34,7 +34,7 @@ get_route_info()
         if [ ! -z ${product_arch} ];then
             if [ ${product_arch} =  "aarch64" ];then
                 product_arch="arm-8"
-            elif [ ${product_arch} =  "armv7hl"  ];then
+            elif [ ${product_arch} =  "armv7l"  ];then
                 product_arch="arm-7"
             elif [ ${product_arch} =  "armv5tel"  ];then
                 product_arch="arm-5"
@@ -63,7 +63,7 @@ get_route_info()
         if [ ! -z ${product_arch} ];then
             if [ ${product_arch} =  "aarch64" ];then
                 product_arch="arm-8"
-            elif [ ${product_arch} =  "armv7hl"  ];then
+            elif [ ${product_arch} =  "armv7l"  ];then
                 product_arch="arm-7"
             elif [ ${product_arch} =  "armv5tel"  ];then
                 product_arch="arm-5"
