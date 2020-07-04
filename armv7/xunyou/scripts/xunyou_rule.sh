@@ -96,7 +96,7 @@ del_ip_rule()
         [ -n "${ret}" ] && ip rule del t ${rtName}
     fi
     #
-    ret=`ip rule | grep ${rtName}`
+    ret=`ip rule | grep "lookup ${rtName}"`
     [ -n "${ret}" ] && ip rule d t ${rtName}
 }
 

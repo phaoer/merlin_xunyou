@@ -15,6 +15,7 @@ ifname="br0"
 BasePath="${xunyouPath}/xunyou"
 RouteCfg="${BasePath}/config/RouteCfg.conf"
 ProxyCfg="${BasePath}/config/ProxyCfg.conf"
+UserInfo="${xunyouPath}/configs/user.info"
 DevType="${xunyouPath}/configs/DeviceType.info"
 ProxyCfgPort="29595"
 RoutePort="28099"
@@ -148,6 +149,7 @@ create_config_file()
     sed -i 's/\("local-port":\).*/\1'${RoutePort}',/g'             ${RouteCfg}
     sed -i 's#\("device-type":"\).*#\1'${DevType}'",#g'            ${RouteCfg}
     sed -i 's#\("upgrade-shell":"\).*#\1'${UpdateScripte}'",#g'    ${RouteCfg}
+    sed -i 's#\("user-info":"\).*#\1'${UserInfo}'",#g'             ${RouteCfg}
     #
     sed -i 's/\("local-ip":"\).*/\1'${gateway}'",/g'        ${ProxyCfg}
     sed -i 's/\("manage":\).*/\1'${ProxyCfgPort}',/g'       ${ProxyCfg}
