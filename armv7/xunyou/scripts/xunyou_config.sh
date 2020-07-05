@@ -221,6 +221,9 @@ xunyou_acc_start()
     ret=`ps | grep -v grep | grep nvram`
     [ -n "${ret}" ] && killall nvram
     #
+    mv ${RouteLog}* /tmp/
+    mv ${ProxyLog}* /tmp/
+    #
     ${BasePath}/bin/${RCtrProc}  --config ${RouteCfg} &
     ${BasePath}/bin/${ProxyProc} --config ${ProxyCfg} &
 }
