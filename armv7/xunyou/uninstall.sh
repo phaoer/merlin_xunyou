@@ -17,11 +17,12 @@ else
     [ ! -d "/jffs" ] && systemType=2
 fi
 
+
 koolshare_uninstall()
 {
     eval `dbus export xunyou_`
     source /koolshare/scripts/base.sh
-
+    #
     sh /koolshare/xunyou/scripts/${MODULE}_config.sh uninstall
 
     values=`dbus list xunyou_ | cut -d "=" -f 1`
@@ -30,8 +31,6 @@ koolshare_uninstall()
     do
         dbus remove $value
     done
-
-    cru d ${module}
 
     rm -rf /koolshare/scripts/xunyou_status.sh
     rm -rf /koolshare/init.d/S90XunYouAcc.sh
@@ -49,7 +48,6 @@ official_uninstall()
     [ ! -d "/jffs/xunyou" ] && return 1
     #
     sh /jffs/xunyou/scripts/${MODULE}_config.sh uninstall
-    cru d ${module}
     #
     rm -rf /etc/init.d/S90XunYouAcc.sh > /dev/null 2>&1
     rm -rf /jffs/xunyou/

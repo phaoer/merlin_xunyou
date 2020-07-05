@@ -76,6 +76,8 @@ official_install()
         [ -n "${ret}" ] && echo [`date +"%Y-%m-%d %H:%M:%S"`] "创建安装路径失败！" && return 1
     fi
     #
+    [ -e "/jffs/xunyou/uninstall.sh" ] && sh /jffs/xunyou/uninstall.sh
+    #
     rm -rf /etc/init.d/S90XunYouAcc.sh > /dev/null 2>&1
     cp -rf /tmp/${MODULE}/*      /jffs/xunyou/
     #
