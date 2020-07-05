@@ -105,11 +105,7 @@ case $1 in
         echo "restart the program"
         [ ！ -d "/tmp/xunyou" ] && exit 0
         sh ${xunyouPath}/scripts/uninstall_xunyou.sh
-        sh /tmp/xunyou/install.sh
-        [ ${systemType} -eq 0] && dbus set xunyou_enable=1
-        sh ${xunyouPath}/scripts/xunyou_status.sh install
-        sh ${xunyouPath}/scripts/xunyou_status.sh stop
-        sh ${xunyouPath}/scripts/xunyou_status.sh start
+        sh /tmp/xunyou/install.sh app
         ;;
     7)
         get_route_info
