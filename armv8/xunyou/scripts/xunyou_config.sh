@@ -263,9 +263,9 @@ xunyou_clear_rule()
 xunyou_acc_stop()
 {
     ctrlPid=`ps | grep -v grep | grep -w ${RCtrProc} | awk -F ' ' '{print $1}'`
-    [ -n "${ctrlPid}" ] && kill -10 ${ctrlPid} && kill -9 ${ctrlPid}
+    [ -n "${ctrlPid}" ] && kill -10 ${ctrlPid}
     proxyPid=`ps | grep -v grep | grep -w ${ProxyProc} | awk -F ' ' '{print $1}'`
-    [ -n "${proxyPid}" ] && kill -10 ${proxyPid} && kill -9 ${proxyPid}
+    [ -n "${proxyPid}" ] && kill -9 ${proxyPid}
     #
     xunyou_clear_rule
 }
