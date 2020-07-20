@@ -152,6 +152,7 @@
 											<div class="xunyou_box" style="position: relative;margin-left: 3%">
 												<p>迅游路由器插件，支持三大主机PS4、Xbox、Switch以及PC设备进行加速。</p>
 												<p>为流畅游戏提供稳定保障，主机NAT类型ALL Open，一键加速即可畅享！</p>
+												<p style="margin-top: 15px;">点击加入<a href="https://jq.qq.com/?_wv=1027&k=NuzmyplP" style="text-decoration: underline;" target="_blank">&lt;迅游路由器插件交流群&gt;</a></p>
 
 												<div class="switch_field" style="position: absolute;width: 50px;height: 30px;top: 15%;right: 1%;">
 													<label for="switch">
